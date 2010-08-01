@@ -1,0 +1,5 @@
+*~
+*.o
+bijou
+vendor/*.lo
+vendor/libtool
