@@ -94,8 +94,8 @@
 /*
  * Opcodes
  * R[x]  - Register x
- * K[x]  - Constant at index x 
- * RK[x] - Register x or constant index x 
+ * K[x]  - Constant at index x
+ * RK[x] - Register x or constant index x
 */
 typedef enum {
         /* name            operands description */
@@ -106,7 +106,7 @@ typedef enum {
         OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
         OP_LOADNIL,     /* A        R[A] = null */
         OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
-        OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */ 
+        OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */
         OP_GETLOCAL,    /* TODO */
         OP_SETLOCAL,    /* TODO */
 

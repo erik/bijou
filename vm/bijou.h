@@ -55,21 +55,21 @@ struct BijouVM;
 struct BijouFrame;
 
 typedef struct BijouString {
-  char *ptr;
-  size_t len;
+        char *ptr;
+        size_t len;
 } BijouString;
 
 
 typedef union {
-  BijouString s;        /* string */
-  bijou_Number n; /* number */
-  int b;          /* boolean */
+        BijouString s;        /* string */
+        bijou_Number n; /* number */
+        int b;          /* boolean */
 } Value;
 
 /* tagged value */
 typedef struct bijou_TValue {
-  Value value;
-  int tt; /* tagged type */ 
+        Value value;
+        int tt; /* tagged type */
 } TValue;
 
 /* pointer to stack index */
@@ -79,7 +79,7 @@ typedef TValue* StkId;
 
 /* macros to test type of TValue */
 #define ttisnull(o)     (ttype(o) == BIJOU_TNULL)
-#define ttisnumber(o)   (ttype(o) == BIJOU_TNUMBER) 
+#define ttisnumber(o)   (ttype(o) == BIJOU_TNUMBER)
 #define ttisboolean(o)  (ttype(o) == BIJOU_TBOOLEAN)
 #define ttisstring(o)   (ttype(o) == BIJOU_TSTRING)
 #define ttisfunction(o) (ttype(o) == BIJOU_FUNCTION)
@@ -98,24 +98,24 @@ typedef TValue* StkId;
 #define MAKE_BIJOU_NUM(num) { TValue x; Value v; v.n = ((bijou_Number)(num)); x.tt = BIJOU_TNUMBER; x.value = v; return x; }
 
 typedef struct BijouBlock {
-  kvec_t(TValue) k;               /* constants */
-  kvec_t(BijouString) strings;    /* string pool */
-  kvec_t(TValue) locals;          /* local variables */
-  kvec_t(TValue) upvals;          /* upvalues */
-  kvec_t(bInst) code;             /* actual code */
-  size_t regc;                    /* register count */  
+        kvec_t(TValue) k;               /* constants */
+        kvec_t(BijouString) strings;    /* string pool */
+        kvec_t(TValue) locals;          /* local variables */
+        kvec_t(TValue) upvals;          /* upvalues */
+        kvec_t(bInst) code;             /* actual code */
+        size_t regc;                    /* register count */
 } BijouBlock;
 
 typedef struct BijouFrame {
-  TValue *stack;
-  TValue *upvals;  
+        TValue *stack;
+        TValue *upvals;
 } BijouFrame;
 
 
 /* TODO: write me! */
- typedef struct BijouVM {
-   int temp;
- } BijouVM;
+typedef struct BijouVM {
+        int temp;
+} BijouVM;
 
 /* block prototypes */
 BijouBlock *BijouBlock_new(void);
@@ -126,6 +126,6 @@ int BijouBlock_find_local(BijouBlock*, TValue);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);
-int TValue_equal(TValue f, TValue S);					    
-			   
+int TValue_equal(TValue f, TValue S);
+
 #endif /* _BIJOU_H_ */

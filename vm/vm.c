@@ -41,35 +41,36 @@ const TValue *to_number(const TValue *obj, TValue *n)
 
 void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
 {
-  UNUSED(vm);
-  UNUSED(argc);
-  UNUSED(argv);
-  size_t w;
-  for(w = 0; w < kv_size(b->k); w++){
-    printf("%d: Type: %d, Val: %d\n", w, b->k.a[w].tt, (int)b->k.a[w].value.n);
-  }
-  assert(b->code.a && "Null pointer madness!");
+        UNUSED(vm);
+        UNUSED(argc);
+        UNUSED(argv);
+        size_t w;
+        for (w = 0; w < kv_size(b->k); w++) {
+                printf("%d: Type: %d, Val: %d\n", w, b->k.a[w].tt, (int)b->k.a[w].value.n);
+        }
+        assert(b->code.a && "Null pointer madness!");
 
-  f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
-  bInst *ip            = b->code.a + start;
-  bInst i              = *ip;
-  TValue *k            = b->k.a;
-  BijouString *strings = b->strings.a;
-  TValue *stack        = f->stack;
+        f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
+        bInst *ip            = b->code.a + start;
+        bInst i              = *ip;
+        TValue *k            = b->k.a;
+        BijouString *strings = b->strings.a;
+        TValue *stack        = f->stack;
 
-  UNUSED(strings);
-  size_t x = 0;
-  
-  for(x = 0; x < kv_size(b->code); x++){
-    printf("Opcode: %d\n", OPCODE);
-    switch(OPCODE){
-      OP(NOP):       DISPATCH;
-      OP(LOADK):     R[A] = k[Bx]; DISPATCH;
-      default: {
-	printf("Don't know Opcode: %d\n", OPCODE);
-	return;
-      }
-    }
-  }
+        UNUSED(strings);
+        size_t x = 0;
+
+        for (x = 0; x < kv_size(b->code); x++) {
+                printf("Opcode: %d\n", OPCODE);
+                switch (OPCODE) {
+                        OP(NOP):       DISPATCH;
+                        OP(LOADK):     R[A] = k[Bx];
+                        DISPATCH;
+                default: {
+                        printf("Don't know Opcode: %d\n", OPCODE);
+                        return;
+                }
+                }
+        }
 }
 

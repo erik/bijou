@@ -44,8 +44,8 @@ loc:
 # reformat code (requires astyle)
 pretty:
 	@echo " Formatting"
-	@astyle -A8 $(SOURCES)
 	@astyle -A8 vm/vendor/*.h
+	@astyle -A8 vm/*.[ch]
 	@rm -f vm/*.orig vm/vendor/*.orig
 
 ${EXECUTABLE}: ${LIBS} ${OBJECTS}
