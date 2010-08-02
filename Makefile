@@ -13,9 +13,8 @@ INCS= -Ivm -Ivendor/gc/include -Ivendor
 LIBS= ${GC}
 GC= vendor/gc/.libs/libgc.a
 LDFLAGS=
-SOURCES= vm/vm.c vm/bijou.c
+SOURCES= vm/vm.c vm/block.c vm/value.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
-#OBJECTS= vm/vm.o vm/bijou.o
 EXECUTABLE=bijou
 
 
@@ -33,14 +32,14 @@ endif
 
 all:  $(EXECUTABLE)
 
-tmp:
-	@echo $(OBJECTS)
-
-sloc:
+# count source lines of code
+# requires sloccount
+sloc: clean
 	@sloccount vm
-depend:
-	$(CC) $(CFLAGS) $(INCS) -MM $(SOURCES)
-o: $(OBJECTS)
+
+loc: 
+	@cd vm && wc -l *.[ch] vendor/*
+
 
 # reformat code (requires astyle)
 pretty:
@@ -59,6 +58,7 @@ ${GC}:
 
 vm/vm.o:   vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h
 vm/bijou.o: vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h
+vm/block.o:   vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
 
 
 clean: 

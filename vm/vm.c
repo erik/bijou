@@ -21,8 +21,6 @@ const TValue *to_number(const TValue *obj, TValue *n)
 
 /* dispatch macros */
 #define NEXT_INST           { (i = *++ip); }
-#define OPCODES             for(;;) {switch(OPCODE) {
-#define END_OPCODES         default: {printf("Don't know Opcode: %d\n", OPCODE); return;} }}
 #define OP(n)               case OP_##n
 #define DISPATCH            NEXT_INST; break
 
@@ -41,19 +39,37 @@ const TValue *to_number(const TValue *obj, TValue *n)
 #define RETURN(x)           return (x)
 #define dojump(pc, i)       (pc) += (i)
 
-void bijou_interpret(void)
+void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
 {
-  // UNUSED(vm);
-  bInst *ip = B_ALLOCN(bInst, 10);
-  bInst i = *ip;
-  size_t x;
-  ip[1] = CREATE_ABC(OP_MOVE, 1, 2, 3);
-  for (x = 0; x < 10; x++) {
-    printf("%d: %d\n", x, ip[x]);
+  UNUSED(vm);
+  UNUSED(argc);
+  UNUSED(argv);
+  size_t w;
+  for(w = 0; w < kv_size(b->k); w++){
+    printf("%d: Type: %d, Val: %d\n", w, b->k.a[w].tt, (int)b->k.a[w].value.n);
   }
+  assert(b->code.a && "Null pointer madness!");
+
+  f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
+  bInst *ip            = b->code.a + start;
+  bInst i              = *ip;
+  TValue *k            = b->k.a;
+  BijouString *strings = b->strings.a;
+  TValue *stack        = f->stack;
+
+  UNUSED(strings);
+  size_t x = 0;
   
-  OPCODES;
-     OP(NOP):       DISPATCH;
-  END_OPCODES;
+  for(x = 0; x < kv_size(b->code); x++){
+    printf("Opcode: %d\n", OPCODE);
+    switch(OPCODE){
+      OP(NOP):       DISPATCH;
+      OP(LOADK):     R[A] = k[Bx]; DISPATCH;
+      default: {
+	printf("Don't know Opcode: %d\n", OPCODE);
+	return;
+      }
+    }
+  }
 }
 

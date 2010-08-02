@@ -1,6 +1,7 @@
 #include "bijou.h"
 #include "internal.h"
 #include "vm.h"
+#include "config.h"
 
 
 int usage(void)
@@ -15,7 +16,17 @@ int main(int argc, char ** argv)
         UNUSED(argc);
         UNUSED(argv);
         printf("SIG: %s\n", BIJOU_SIGNATURE);
-        bijou_interpret();
+
+	struct BijouVM a;
+	a.temp = 0;
+       	
+	BijouBlock *b = BijouBlock_new();
+	BijouBlock_push_const(b, create_bijou_Number(10));
+	printf("FOUND AT: %d\n", BijouBlock_find_const(b,
+			  create_bijou_Number(10)));
+	BijouFrame frame;
+
+        bijou_interpret(&a, &frame, b, 0, 0, NULL );
         return usage();
 }
 
