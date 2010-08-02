@@ -22,8 +22,9 @@ int main(int argc, char ** argv)
 
         BijouBlock *b = BijouBlock_new();
         BijouBlock_push_const(b, create_bijou_Number(10));
-        printf("FOUND AT: %d\n", BijouBlock_find_const(b,
-                        create_bijou_Number(10)));
+        BijouBlock_push_const(b, create_bijou_Number(12));
+        BijouBlock_push_const(b, create_bijou_Number(13));
+
         BijouFrame frame;
 
         bijou_interpret(&a, &frame, b, 0, 0, NULL );

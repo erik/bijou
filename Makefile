@@ -13,7 +13,7 @@ INCS= -Ivm -Ivendor/gc/include -Ivendor
 LIBS= ${GC}
 GC= vendor/gc/.libs/libgc.a
 LDFLAGS=
-SOURCES= vm/vm.c vm/block.c vm/value.c vm/bijou.c
+SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
 
@@ -38,15 +38,17 @@ sloc: clean
 	@sloccount vm
 
 loc: 
-	@cd vm && wc -l *.[ch] vendor/*
+	@cd vm && wc -l *.[ch] vendor/* | grep total
 
+size: 
+	@rm -f vm/*~ && du -sh vm
 
 # reformat code (requires astyle)
 pretty:
-	@echo " Formatting"
-	@astyle -A8 vm/vendor/*.h
-	@astyle -A8 vm/*.[ch]
-	@rm -f vm/*.orig vm/vendor/*.orig
+	@echo " formatting"
+	@astyle -A8 vm/*.[ch] | grep formatted \
+		|| echo "   no changes"
+	@rm -f vm/*.orig
 
 ${EXECUTABLE}: ${LIBS} ${OBJECTS}
 	@echo " link $(EXECUTABLE)"
@@ -56,14 +58,17 @@ ${GC}:
 	@echo " make gc"
 	@cd vendor/gc && ./configure --disable-threads -q && make -s
 
-vm/vm.o:   vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h
+vm/vm.o:    vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h
 vm/bijou.o: vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h
-vm/block.o:   vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
+vm/block.o: vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
+vm/string.o: vm/string.c vm/bijou.h vm/internal.h vm/vm.h
 
 
-clean: 
-	rm -f vm/*.o
-	rm -f $(EXECUTABLE)
+clean:
+	@echo " cleaning"
+	@rm -f vm/*.o
+	@rm -f vm/*~
+	@rm -f $(EXECUTABLE)
 
 rebuild: clean $(EXECUTABLE)
 

@@ -95,8 +95,6 @@ typedef TValue* StkId;
 
 #define settype(o, t)       { (o)->tt  = t; }
 
-#define MAKE_BIJOU_NUM(num) { TValue x; Value v; v.n = ((bijou_Number)(num)); x.tt = BIJOU_TNUMBER; x.value = v; return x; }
-
 typedef struct BijouBlock {
         kvec_t(TValue) k;               /* constants */
         kvec_t(BijouString) strings;    /* string pool */
@@ -123,9 +121,20 @@ int BijouBlock_push_const(BijouBlock*, TValue);
 int BijouBlock_push_local(BijouBlock*, TValue);
 int BijouBlock_find_const(BijouBlock*, TValue);
 int BijouBlock_find_local(BijouBlock*, TValue);
+int BijouBlock_push_string(BijouBlock*, BijouString);
+int BijouBlock_find_string(BijouBlock*, BijouString);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);
-int TValue_equal(TValue f, TValue S);
+int TValue_equal(TValue, TValue);
+char *TValue_to_string(TValue);
+BijouString TValue_to_BijouString(TValue);
+
+/* String functions */
+BijouString BijouString_new(char * str);
+BijouString BijouString_cat(BijouString, BijouString);
+int BijouString_len(BijouString);
+BijouString BijouString_substr(BijouString, int, int);
+int BijouString_equal(BijouString, BijouString);
 
 #endif /* _BIJOU_H_ */

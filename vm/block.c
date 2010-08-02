@@ -61,3 +61,25 @@ int BijouBlock_find_local(BijouBlock *b, TValue v)
         }
         return -1;
 }
+
+/* push a string into the string pool
+ * returns index
+ */
+int BijouBlock_push_string(BijouBlock *b, BijouString string)
+{
+        kv_push(BijouString, b->strings, string);
+        return kv_size(b->strings) - 1;
+}
+
+/* search for string matching TValue v
+ * return index of match, or -1 if not found
+ */
+int BijouBlock_find_string(BijouBlock *b, BijouString str)
+{
+        size_t i;
+        for (i = 0; i < kv_size(b->strings); i++) {
+                if (BijouString_equal(str, kv_A(b->strings, i)))
+                        return i;
+        }
+        return -1;
+}
