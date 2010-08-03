@@ -126,9 +126,11 @@ int BijouBlock_find_string(BijouBlock*, BijouString);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);
+TValue create_TValue_string(BijouString);
 int TValue_equal(TValue, TValue);
 char *TValue_to_string(TValue);
 BijouString TValue_to_BijouString(TValue);
+char *TValue_type_to_string(TValue);
 
 /* String functions */
 BijouString BijouString_new(char * str);

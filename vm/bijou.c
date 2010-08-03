@@ -22,8 +22,11 @@ int main(int argc, char ** argv)
 
         BijouBlock *b = BijouBlock_new();
         BijouBlock_push_const(b, create_bijou_Number(10));
-        BijouBlock_push_const(b, create_bijou_Number(12));
+        BijouBlock_push_const(b, create_bijou_Number(10));
         BijouBlock_push_const(b, create_bijou_Number(13));
+
+        BijouBlock_push_const(b, create_TValue_string(BijouString_new("abc")));
+        BijouBlock_push_const(b, create_TValue_string(BijouString_new("abc")));
 
         BijouFrame frame;
 

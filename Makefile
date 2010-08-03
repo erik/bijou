@@ -34,7 +34,7 @@ all:  $(EXECUTABLE)
 
 # count source lines of code
 # requires sloccount
-sloc: clean
+sloc: 
 	@sloccount vm
 
 loc: 

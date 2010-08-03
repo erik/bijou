@@ -20,6 +20,20 @@ TValue create_bijou_Number(bijou_Number num)
         return ret;
 }
 
+/* create a TValue from a BijouString */
+TValue create_TValue_string(BijouString s)
+{
+        TValue tv;
+        Value v;
+
+        v.s = s;
+        tv.tt = BIJOU_TSTRING;
+        tv.value = v;
+
+        return tv;
+
+}
+
 /* returns nonzero if the two parameters are equal,
  * zero otherwise.
  */
@@ -29,7 +43,7 @@ int TValue_equal(TValue f, TValue s)
         return f.tt == s.tt ? f.tt == BIJOU_TNULL ? 1 : \
                f.tt == BIJOU_TNUMBER || f.tt == BIJOU_TBOOLEAN \
                ? (f.value.n == s.value.n) : f.tt == BIJOU_TSTRING ? \
-               strcmp(f.value.s.ptr, s.value.s.ptr) == 0 : &f == &s : 0;
+               BijouString_equal(f.value.s, s.value.s) : &f == &s : 0;
 }
 
 
@@ -61,4 +75,25 @@ char *TValue_to_string(TValue t)
 BijouString TValue_to_BijouString(TValue t)
 {
         return BijouString_new(TValue_to_string(t));
+}
+
+/* return a string representation of TValue t */
+char *TValue_type_to_string(TValue t)
+{
+        switch (t.tt) {
+        case BIJOU_TNONE:
+                return "NONE";
+        case BIJOU_TNULL:
+                return "null";
+        case BIJOU_TNUMBER:
+                return "number";
+        case BIJOU_TBOOLEAN:
+                return "bool";
+        case BIJOU_TSTRING:
+                return "string";
+        case BIJOU_TFUNCTION:
+                return "function";
+        default:
+                return "I haven't a damn clue.";
+        }
 }

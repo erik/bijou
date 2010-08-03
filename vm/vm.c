@@ -46,7 +46,7 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
         UNUSED(argv);
         size_t w;
         for (w = 0; w < kv_size(b->k); w++) {
-                printf("%d: Type: %d, Val: %d\n", w, b->k.a[w].tt, (int)b->k.a[w].value.n);
+                printf("%d: Type: %s, Val: %s\n", w, TValue_type_to_string(b->k.a[w]), TValue_to_string(b->k.a[w]));
         }
         assert(b->code.a && "Null pointer madness!");
 

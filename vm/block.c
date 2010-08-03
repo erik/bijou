@@ -19,10 +19,16 @@ BijouBlock *BijouBlock_new()
 }
 
 /* push a TValue into constants of block
- * returns index
+ * returns index, or -1 if the value has
+ * already been added
  */
 int BijouBlock_push_const(BijouBlock *b, TValue v)
 {
+        size_t i;
+        for (i = 0; i < kv_size(b->k); ++i) {
+                if (TValue_equal(kv_A(b->k, i), v))
+                        return -1;
+        }
         kv_push(TValue, b->k, v);
         return kv_size(b->k) - 1;
 }
