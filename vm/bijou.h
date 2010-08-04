@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "gc.h"
 #include "vendor/kvec.h"
 
 #include "config.h"
@@ -21,11 +20,18 @@
 
 #define UNUSED(x)     ((void)(x))
 
-/* TODO: garbage collection macros */
+#ifdef GC
+#include "gc.h"
 #define B_MALLOC      GC_MALLOC
 #define B_CALLOC(m,n) GC_MALLOC((m)*(n))
 #define B_REALLOC     GC_REALLOC
 #define B_FREE(x)     UNUSED(x)
+#else
+#define B_MALLOC      malloc
+#define B_CALLOC(m,n) malloc((m)*(n))
+#define B_REALLOC     realloc
+#define B_FREE(x)     free(x)
+#endif
 
 #define VM            struct BijouVM *vm
 
@@ -123,9 +129,13 @@ int BijouBlock_find_const(BijouBlock*, TValue);
 int BijouBlock_find_local(BijouBlock*, TValue);
 int BijouBlock_push_string(BijouBlock*, BijouString);
 int BijouBlock_find_string(BijouBlock*, BijouString);
+int BijouBlock_push_instruction(BijouBlock*, bInst);
+bInst BijouBlock_fetch_instruction(BijouBlock*, int);
+void BijouBlock_dump(BijouBlock*);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);
+TValue create_boolean(bijou_Number);
 TValue create_TValue_string(BijouString);
 int TValue_equal(TValue, TValue);
 char *TValue_to_string(TValue);
@@ -138,5 +148,6 @@ BijouString BijouString_cat(BijouString, BijouString);
 int BijouString_len(BijouString);
 BijouString BijouString_substr(BijouString, int, int);
 int BijouString_equal(BijouString, BijouString);
+char *BijouString_to_cstring(BijouString);
 
 #endif /* _BIJOU_H_ */

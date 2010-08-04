@@ -50,3 +50,9 @@ int BijouString_equal(BijouString one, BijouString two)
 {
         return one.len == two.len && (strcmp(one.ptr, two.ptr) == 0);
 }
+
+/* return a char * from a BijouString */
+char *BijouString_to_cstring(BijouString x)
+{
+        return x.ptr;
+}

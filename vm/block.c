@@ -5,6 +5,10 @@
 #include "internal.h"
 #include "bijou.h"
 
+static const char * opcode_names[] = { OPCODE_LABELS };
+static const int  opcode_args[] = { OPCODE_ARGS };
+
+static void print_op(bInst);
 
 BijouBlock *BijouBlock_new()
 {
@@ -38,8 +42,13 @@ int BijouBlock_push_const(BijouBlock *b, TValue v)
  */
 int BijouBlock_push_local(BijouBlock *b, TValue v)
 {
-        kv_push(TValue, b->upvals, v);
-        return kv_size(b->k) - 1;
+        size_t i;
+        for (i = 0; i < kv_size(b->locals); ++i) {
+                if (TValue_equal(kv_A(b->locals, i), v))
+                        return -1;
+        }
+        kv_push(TValue, b->locals, v);
+        return kv_size(b->locals) - 1;
 }
 
 /* search for constant matching TValue v
@@ -61,8 +70,8 @@ int BijouBlock_find_const(BijouBlock *b, TValue v)
 int BijouBlock_find_local(BijouBlock *b, TValue v)
 {
         size_t i;
-        for (i = 0; i < kv_size(b->k); i++) {
-                if (TValue_equal(v, kv_A(b->k, i)))
+        for (i = 0; i < kv_size(b->locals); i++) {
+                if (TValue_equal(v, kv_A(b->locals, i)))
                         return i;
         }
         return -1;
@@ -73,8 +82,14 @@ int BijouBlock_find_local(BijouBlock *b, TValue v)
  */
 int BijouBlock_push_string(BijouBlock *b, BijouString string)
 {
+        size_t i;
+        for (i = 0; i < kv_size(b->strings); ++i) {
+                if (BijouString_equal(kv_A(b->strings, i), string))
+                        return -1;
+        }
         kv_push(BijouString, b->strings, string);
         return kv_size(b->strings) - 1;
+
 }
 
 /* search for string matching TValue v
@@ -88,4 +103,142 @@ int BijouBlock_find_string(BijouBlock *b, BijouString str)
                         return i;
         }
         return -1;
+}
+/* pushes an instruction into the block. returns the index */
+int BijouBlock_push_instruction(BijouBlock *b, bInst inst)
+{
+        kv_push(bInst, b->code, inst);
+        return kv_size(b->code) - 1;
+}
+
+/* returns instruction at index, or -1 if index is greater
+ * than number of instructions
+ */
+bInst BijouBlock_fetch_instruction(BijouBlock *b, int index)
+{
+        if (index >= (int)kv_size(b->code))
+                return -1;
+        return kv_A(b->code, index);
+}
+
+/* prints out data contained in BijouBlock b in
+ * a human readable format (for debugging, etc.)
+ */
+void BijouBlock_dump(BijouBlock *b)
+{
+
+        size_t x;
+        printf("; block at: %p\n", (void *)b);
+        printf("; %d registers\n", (int)b->regc);
+
+        printf("; constants (%d)\n", (int)kv_size(b->k));
+        for (x = 0; x < kv_size(b->k); ++x) {
+                printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->k, x)),
+                       TValue_to_string(kv_A(b->k, x)));
+        }
+
+        printf("; strings (%d)\n", (int)kv_size(b->strings));
+        for (x = 0; x < kv_size(b->strings); ++x) {
+                printf("\t%d: \"%s\"\n", (int)x, BijouString_to_cstring(kv_A(b->strings, x)));
+        }
+
+        printf("; locals (%d)\n", (int)kv_size(b->locals));
+        for (x = 0; x < kv_size(b->locals); ++x) {
+                printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->locals, x)),
+                       TValue_to_string(kv_A(b->locals, x)));
+        }
+
+        printf("; upvals (%d)\n",(int) kv_size(b->upvals));
+        for (x = 0; x < kv_size(b->upvals); ++x) {
+                printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->upvals, x)),
+                       TValue_to_string(kv_A(b->upvals, x)));
+        }
+
+        printf("; code section (%d instructions)\n", (int)kv_size(b->code));
+        for (x = 0; x < kv_size(b->code); ++x) {
+                bInst i = kv_A(b->code, x);
+                print_op(i);
+                printf("\t");
+
+                /* TODO: add some more cases */
+                switch (GET_OPCODE(i)) {
+                case OP_MOVE:
+                        printf("; R[%d] = R[%d]", GETARG_A(i), GETARG_B(i));
+                        break;
+                case OP_LOADK:
+                        printf("; R[%d] = K[%d]", GETARG_A(i), GETARG_Bx(i));
+                        break;
+                case OP_LOADBOOL:
+                        printf("; R[%d] = %s", GETARG_A(i), GETARG_B(i) == 0 ? "false" : "true" );
+                        break;
+                case OP_LOADNIL:
+                        printf("; R[%d] = null", GETARG_A(i));
+                        break;
+                case OP_GETGLOBAL:
+                        printf("; R[%d] = globals[K[%d]]", GETARG_A(i), GETARG_Bx(i));
+                        break;
+                case OP_SETGLOBAL:
+                        printf("; globals[K[%d]] = R[%d]", GETARG_Bx(i), GETARG_A(i));
+                        break;
+                case OP_GETLOCAL:
+                        printf("; R[%d] = locals[K[%d]]", GETARG_A(i), GETARG_Bx(i));
+                        break;
+                case OP_SETLOCAL:
+                        printf("; locals[K[%d]] = R[%d]", GETARG_Bx(i), GETARG_A(i));
+                        break;
+                case OP_ADD:
+                        printf("; R[%d] = RK[%d] + RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_SUB:
+                        printf("; R[%d] = RK[%d] - RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_MUL:
+                        printf("; R[%d] = RK[%d] * RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_DIV:
+                        printf("; R[%d] = RK[%d] / RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_POW:
+                        printf("; R[%d] = RK[%d] ** RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_REM:
+                        printf("; R[%d] = RK[%d] %% RK[%d]", GETARG_A(i), GETARG_B(i),
+			       GETARG_C(i));
+                        break;
+                case OP_UNM:
+		        printf("; R[%d] = -RK[%d]", GETARG_A(i), GETARG_B(i));
+                        break;
+                case OP_NOT:
+		        printf("; R[%d] = !RK[%d]", GETARG_A(i), GETARG_B(i));
+                        break;			
+                }
+                printf("\n");
+        }
+}
+
+/* helper function to print out the opcode
+ * as well as the arguments
+ */
+static void print_op(bInst op)
+{
+        int args = opcode_args[GET_OPCODE(op)];
+        printf("\t%s", opcode_names[GET_OPCODE(op)]);
+        if (args == ARG_NONE)
+                return;
+        if (HASARG_A(args))
+                printf(" %d", GETARG_A(op));
+        if (HASARG_B(args))
+                printf(" %d", GETARG_B(op));
+        if (HASARG_C(args))
+                printf(" %d", GETARG_C(op));
+        if (HASARG_Bx(args))
+                printf(" %d", GETARG_Bx(op));
+        if (HASARG_sBx(args))
+                printf(" %d", GETARG_sBx(op));
+        return;
 }

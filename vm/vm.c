@@ -44,10 +44,9 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
         UNUSED(vm);
         UNUSED(argc);
         UNUSED(argv);
-        size_t w;
-        for (w = 0; w < kv_size(b->k); w++) {
-                printf("%d: Type: %s, Val: %s\n", w, TValue_type_to_string(b->k.a[w]), TValue_to_string(b->k.a[w]));
-        }
+
+        BijouBlock_dump(b);
+
         assert(b->code.a && "Null pointer madness!");
 
         f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
@@ -60,16 +59,26 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
         UNUSED(strings);
         size_t x = 0;
 
+	/* TODO: this doesn't allow for jumps to happen... */
         for (x = 0; x < kv_size(b->code); x++) {
                 printf("Opcode: %d\n", OPCODE);
                 switch (OPCODE) {
                         OP(NOP):       DISPATCH;
-                        OP(LOADK):     R[A] = k[Bx];
-                        DISPATCH;
-                default: {
+                        OP(MOVE):      {
+                                R[A] = R[B];
+                                DISPATCH;
+                        }
+                        OP(LOADK):     {
+                                R[A] = k[Bx];
+                                DISPATCH;
+                        }
+                        OP(LOADBOOL):  {
+                                R[A] = create_boolean(B);
+                                DISPATCH;
+                        }
+                default:
                         printf("Don't know Opcode: %d\n", OPCODE);
                         return;
-                }
                 }
         }
 }

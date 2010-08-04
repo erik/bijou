@@ -20,6 +20,16 @@ TValue create_bijou_Number(bijou_Number num)
         return ret;
 }
 
+TValue create_boolean(bijou_Number val)
+{
+        Value v;
+        v.b = val;
+        TValue ret;
+        ret.tt = BIJOU_TBOOLEAN;
+        ret.value = v;
+        return ret;
+}
+
 /* create a TValue from a BijouString */
 TValue create_TValue_string(BijouString s)
 {

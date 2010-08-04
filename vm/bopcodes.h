@@ -22,13 +22,13 @@
 #define POS_B     (POS_C + SIZE_C)
 #define POS_Bx    POS_C
 
-#if SIZE_Bx < TR_BITSINT-1
+//#if SIZE_Bx < TR_BITSINT-1
 #define MAXARG_Bx   ((1<<SIZE_Bx)-1)
 #define MAXARG_sBx  (MAXARG_Bx>>1)         /* `sBx' is signed */
-#else
-#define MAXARG_Bx   MAX_INT
-#define MAXARG_sBx  MAX_INT
-#endif
+//#else
+//#define MAXARG_Bx   MAX_INT
+//#define MAXARG_sBx  MAX_INT
+//#endif
 
 /* creates a mask with `n' 1 bits at position `p' */
 #define MASK1(n,p)  ((~((~(bInst)0)<<n))<<p)
@@ -117,7 +117,7 @@ typedef enum {
         OP_DIV,         /* A B C    R[A] = RK[B] / RK[C] */
         OP_POW,         /* A B C    R[A] = RK[B] ** RK[C] */
         OP_REM,         /* A B C    R[A] = RK[B] % RK[C] */
-        OP_UMN,         /* A B      R[A] = -RK[B] */
+        OP_UNM,         /* A B      R[A] = -RK[B] */
 
         OP_NOT,         /* A B      R[A] = !RK[B] */
 
@@ -130,5 +130,74 @@ typedef enum {
         OP_JMP,         /* sBx      pc += sBx */
         OP_RETURN       /* A        return RK[A] */
 } OpCodes;
+
+/* for OPCODE_ARGS bitmask magic */
+#define ARG_NONE (1 << 0)
+#define ARG_A    (1 << 1)
+#define ARG_B    (1 << 2)
+#define ARG_C    (1 << 3)
+#define ARG_Bx   (1 << 4)
+#define ARG_sBx  (1 << 5)
+
+#define HASARG_A(i)   ((i) & ARG_A)
+#define HASARG_B(i)   ((i) & ARG_B)
+#define HASARG_C(i)   ((i) & ARG_C)
+#define HASARG_Bx(i)  ((i) & ARG_Bx)
+#define HASARG_sBx(i) ((i) & ARG_sBx)
+
+/* specify the number of arguments each
+ * opcode takes. Used for the print_op
+ * helper function
+ */
+#define OPCODE_ARGS \
+  ARG_NONE, \
+  ARG_A | ARG_B,			\
+  ARG_A | ARG_Bx,			\
+  ARG_A | ARG_B,			\
+  ARG_A,				\
+  /* getglobal */  ARG_A | ARG_Bx,      \
+  ARG_A | ARG_Bx,			\
+  ARG_A | ARG_Bx,			\
+  ARG_A | ARG_Bx,			\
+  /* add */ ARG_A | ARG_B | ARG_C,	\
+  ARG_A | ARG_B | ARG_C,		\
+  ARG_A | ARG_B | ARG_C,		\
+  ARG_A | ARG_B | ARG_C,		\
+  ARG_A | ARG_B | ARG_C,		\
+  ARG_A | ARG_B | ARG_C,		\
+  /* unm */ ARG_A | ARG_B, 		\
+  ARG_A | ARG_B,			\
+  ARG_A | ARG_B,			\
+  ARG_A | ARG_B,			\
+  ARG_A | ARG_B,			\
+  ARG_A | ARG_B,			\
+  /* ge */ ARG_A | ARG_B,		\
+  ARG_sBx,				\
+  ARG_A
+
+#define OPCODE_LABELS "nop",			\
+    "move",					\
+    "loadk",					\
+    "loadbool",					\
+    "loadnil",					\
+    "getglobal",				\
+    "setglobal",				\
+    "getlocal",					\
+    "setlocal",					\
+    "add",					\
+    "sub",					\
+    "mul",					\
+    "div",					\
+    "pow",					\
+    "rem",					\
+    "unm",					\
+    "not",					\
+    "eq",					\
+    "lt",					\
+    "gt",					\
+    "le",					\
+    "ge",					\
+    "jmp",					\
+    "return"
 
 #endif /* _BOPCODES_H_ */

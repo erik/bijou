@@ -8,7 +8,7 @@ compat = true
 debug = true
 
 CC=gcc
-CFLAGS=  -Wall -Wextra -Werror -std=c99 $(OPTIMIZE)
+CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) -DGC
 INCS= -Ivm -Ivendor/gc/include -Ivendor
 LIBS= ${GC}
 GC= vendor/gc/.libs/libgc.a
@@ -16,7 +16,6 @@ LDFLAGS=
 SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
-
 
 ifndef no_optimize
 OPTIMIZE = -O3
@@ -35,7 +34,7 @@ all:  $(EXECUTABLE)
 # count source lines of code
 # requires sloccount
 sloc: 
-	@sloccount vm
+	@sloccount vm | grep '(SLOC)'
 
 loc: 
 	@cd vm && wc -l *.[ch] vendor/* | grep total
@@ -46,9 +45,8 @@ size:
 # reformat code (requires astyle)
 pretty:
 	@echo " formatting"
-	@astyle -A8 vm/*.[ch] | grep formatted \
+	@astyle -A8 -n vm/*.[ch] | grep formatted \
 		|| echo "   no changes"
-	@rm -f vm/*.orig
 
 ${EXECUTABLE}: ${LIBS} ${OBJECTS}
 	@echo " link $(EXECUTABLE)"
