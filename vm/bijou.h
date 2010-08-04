@@ -101,6 +101,9 @@ typedef TValue* StkId;
 
 #define settype(o, t)       { (o)->tt  = t; }
 
+/* TValue to bijou_Number */
+#define TV2BN(o)        (o).value.n
+
 typedef struct BijouBlock {
         kvec_t(TValue) k;               /* constants */
         kvec_t(BijouString) strings;    /* string pool */
@@ -136,6 +139,7 @@ void BijouBlock_dump(BijouBlock*);
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);
 TValue create_boolean(bijou_Number);
+TValue create_null(void);
 TValue create_TValue_string(BijouString);
 int TValue_equal(TValue, TValue);
 char *TValue_to_string(TValue);

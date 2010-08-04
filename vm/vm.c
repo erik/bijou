@@ -52,14 +52,15 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
         f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
         bInst *ip            = b->code.a + start;
         bInst i              = *ip;
-        TValue *k            = b->k.a;
+        TValue *locals       = b->locals.a;
+        TValue *K            = b->k.a;
         BijouString *strings = b->strings.a;
         TValue *stack        = f->stack;
 
         UNUSED(strings);
         size_t x = 0;
 
-	/* TODO: this doesn't allow for jumps to happen... */
+        /* TODO: this doesn't allow for jumps to happen... */
         for (x = 0; x < kv_size(b->code); x++) {
                 printf("Opcode: %d\n", OPCODE);
                 switch (OPCODE) {
@@ -69,11 +70,27 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                                 DISPATCH;
                         }
                         OP(LOADK):     {
-                                R[A] = k[Bx];
+                                R[A] = K[Bx];
                                 DISPATCH;
                         }
                         OP(LOADBOOL):  {
                                 R[A] = create_boolean(B);
+                                DISPATCH;
+                        }
+                        OP(LOADNULL): {
+                                R[A] = create_null();
+                                DISPATCH;
+                        }
+
+                        /* TODO: GETGLOBAL */
+                        /* TODO: SETGLOBAL */
+
+                        OP(GETLOCAL): {
+                                R[A] = locals[(int)TV2BN(K[Bx])];
+                                DISPATCH;
+                        }
+                        OP(SETLOCAL): {
+                                locals[(int)TV2BN(K[Bx])] = R[A];
                                 DISPATCH;
                         }
                 default:

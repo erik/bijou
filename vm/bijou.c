@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
         BijouBlock *b = BijouBlock_new();
         BijouBlock_push_const(b, create_bijou_Number(42));
         BijouBlock_push_const(b, create_bijou_Number(-100));
-	BijouBlock_push_const(b, create_boolean(0));
+        BijouBlock_push_const(b, create_boolean(0));
 
 
         BijouBlock_push_string(b, BijouString_new("a string"));

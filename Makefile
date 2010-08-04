@@ -63,7 +63,7 @@ vm/string.o: vm/string.c vm/bijou.h vm/internal.h vm/vm.h
 
 
 clean:
-	@echo " cleaning"
+	@echo " cleaning up"
 	@rm -f vm/*.o
 	@rm -f vm/*~
 	@rm -f $(EXECUTABLE)

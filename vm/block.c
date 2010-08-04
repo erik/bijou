@@ -126,7 +126,6 @@ bInst BijouBlock_fetch_instruction(BijouBlock *b, int index)
  */
 void BijouBlock_dump(BijouBlock *b)
 {
-
         size_t x;
         printf("; block at: %p\n", (void *)b);
         printf("; %d registers\n", (int)b->regc);
@@ -171,7 +170,7 @@ void BijouBlock_dump(BijouBlock *b)
                 case OP_LOADBOOL:
                         printf("; R[%d] = %s", GETARG_A(i), GETARG_B(i) == 0 ? "false" : "true" );
                         break;
-                case OP_LOADNIL:
+                case OP_LOADNULL:
                         printf("; R[%d] = null", GETARG_A(i));
                         break;
                 case OP_GETGLOBAL:
@@ -188,34 +187,34 @@ void BijouBlock_dump(BijouBlock *b)
                         break;
                 case OP_ADD:
                         printf("; R[%d] = RK[%d] + RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_SUB:
                         printf("; R[%d] = RK[%d] - RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_MUL:
                         printf("; R[%d] = RK[%d] * RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_DIV:
                         printf("; R[%d] = RK[%d] / RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_POW:
                         printf("; R[%d] = RK[%d] ** RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_REM:
                         printf("; R[%d] = RK[%d] %% RK[%d]", GETARG_A(i), GETARG_B(i),
-			       GETARG_C(i));
+                               GETARG_C(i));
                         break;
                 case OP_UNM:
-		        printf("; R[%d] = -RK[%d]", GETARG_A(i), GETARG_B(i));
+                        printf("; R[%d] = -RK[%d]", GETARG_A(i), GETARG_B(i));
                         break;
                 case OP_NOT:
-		        printf("; R[%d] = !RK[%d]", GETARG_A(i), GETARG_B(i));
-                        break;			
+                        printf("; R[%d] = !RK[%d]", GETARG_A(i), GETARG_B(i));
+                        break;
                 }
                 printf("\n");
         }

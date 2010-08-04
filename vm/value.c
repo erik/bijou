@@ -6,9 +6,6 @@
 #include <stdio.h>
 
 
-/* TValue to bijou_Number */
-#define TV2BN(o)        (o).value.n
-
 /* create a TValue from a number */
 TValue create_bijou_Number(bijou_Number num)
 {
@@ -20,6 +17,7 @@ TValue create_bijou_Number(bijou_Number num)
         return ret;
 }
 
+/* create a boolean from val, 0 => false, not-0 => true */
 TValue create_boolean(bijou_Number val)
 {
         Value v;
@@ -29,6 +27,14 @@ TValue create_boolean(bijou_Number val)
         ret.value = v;
         return ret;
 }
+/* create a TValue with the value of null */
+TValue create_null(void)
+{
+        TValue ret;
+        ret.tt = BIJOU_TNULL;
+        return ret;
+}
+
 
 /* create a TValue from a BijouString */
 TValue create_TValue_string(BijouString s)

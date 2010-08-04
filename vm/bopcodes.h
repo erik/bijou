@@ -104,11 +104,11 @@ typedef enum {
         OP_MOVE,        /* A B      R[A] = R[B] */
         OP_LOADK,       /* A Bx     R[A] = K[Bx] */
         OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
-        OP_LOADNIL,     /* A        R[A] = null */
+        OP_LOADNULL,     /* A        R[A] = null */
         OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
         OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */
-        OP_GETLOCAL,    /* TODO */
-        OP_SETLOCAL,    /* TODO */
+        OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
+        OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
 
         /* Math ops */
         OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */
@@ -179,7 +179,7 @@ typedef enum {
     "move",					\
     "loadk",					\
     "loadbool",					\
-    "loadnil",					\
+    "loadnull",					\
     "getglobal",				\
     "setglobal",				\
     "getlocal",					\
