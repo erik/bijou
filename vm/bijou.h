@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
 
 #include "vendor/kvec.h"
 
@@ -61,21 +62,21 @@ struct BijouVM;
 struct BijouFrame;
 
 typedef struct BijouString {
-        char *ptr;
-        size_t len;
+    char *ptr;
+    size_t len;
 } BijouString;
 
 
 typedef union {
-        BijouString s;        /* string */
-        bijou_Number n; /* number */
-        int b;          /* boolean */
+    BijouString s;        /* string */
+    bijou_Number n; /* number */
+    int b;          /* boolean */
 } Value;
 
 /* tagged value */
 typedef struct bijou_TValue {
-        Value value;
-        int tt; /* tagged type */
+    Value value;
+    int tt; /* tagged type */
 } TValue;
 
 /* pointer to stack index */
@@ -105,23 +106,23 @@ typedef TValue* StkId;
 #define TV2BN(o)        (o).value.n
 
 typedef struct BijouBlock {
-        kvec_t(TValue) k;               /* constants */
-        kvec_t(BijouString) strings;    /* string pool */
-        kvec_t(TValue) locals;          /* local variables */
-        kvec_t(TValue) upvals;          /* upvalues */
-        kvec_t(bInst) code;             /* actual code */
-        size_t regc;                    /* register count */
+    kvec_t(TValue) k;               /* constants */
+    kvec_t(BijouString) strings;    /* string pool */
+    kvec_t(TValue) locals;          /* local variables */
+    kvec_t(TValue) upvals;          /* upvalues */
+    kvec_t(bInst) code;             /* actual code */
+    size_t regc;                    /* register count */
 } BijouBlock;
 
 typedef struct BijouFrame {
-        TValue *stack;
-        TValue *upvals;
+    TValue *stack;
+    TValue *upvals;
 } BijouFrame;
 
 
 /* TODO: write me! */
 typedef struct BijouVM {
-        int temp;
+    int temp;
 } BijouVM;
 
 /* block prototypes */
@@ -153,5 +154,15 @@ int BijouString_len(BijouString);
 BijouString BijouString_substr(BijouString, int, int);
 int BijouString_equal(BijouString, BijouString);
 char *BijouString_to_cstring(BijouString);
+
+/* Numeric functions */
+TValue TValue_num_add(TValue, TValue);
+TValue TValue_num_sub(TValue, TValue);
+TValue TValue_num_mul(TValue, TValue);
+TValue TValue_num_div(TValue, TValue);
+TValue TValue_num_pow(TValue, TValue);
+TValue TValue_num_rem(TValue, TValue);
+TValue TValue_num_unm(TValue);
+
 
 #endif /* _BIJOU_H_ */

@@ -25,7 +25,7 @@
 #define check_exp(check, exp)   (bijou_assert(check), exp)
 
 typedef struct {
-        int x;
-        //  BijouVM *vm;
+    int x;
+    //  BijouVM *vm;
 } BijouCompiler;
 #endif /* _INTERNAL_H_ */

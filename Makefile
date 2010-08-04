@@ -8,12 +8,12 @@ compat = true
 debug = true
 
 CC=gcc
-CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) -DGC
+CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) -lm -DGC
 INCS= -Ivm -Ivendor/gc/include -Ivendor
 LIBS= ${GC}
 GC= vendor/gc/.libs/libgc.a
-LDFLAGS=
-SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/bijou.c
+LDFLAGS= 
+SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
 
@@ -45,7 +45,7 @@ size:
 # reformat code (requires astyle)
 pretty:
 	@echo " formatting"
-	@astyle -A8 -n vm/*.[ch] | grep formatted \
+	@astyle -A4 -n vm/*.[ch] | grep formatted \
 		|| echo "   no changes"
 
 ${EXECUTABLE}: ${LIBS} ${OBJECTS}
@@ -60,7 +60,7 @@ vm/vm.o:    vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h
 vm/bijou.o: vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h
 vm/block.o: vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
 vm/string.o: vm/string.c vm/bijou.h vm/internal.h vm/vm.h
-
+vm/number.o: vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
 
 clean:
 	@echo " cleaning up"

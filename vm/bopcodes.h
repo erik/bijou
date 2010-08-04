@@ -78,6 +78,8 @@
  */
 #define BITRK      (1 << (SIZE_B - 1))
 
+#define MAKEK(x) (x | BITRK)
+
 /* test whether a given value is a constant */
 #define ISK(x)     ((x) & BITRK)
 
@@ -98,37 +100,37 @@
  * RK[x] - Register x or constant index x
 */
 typedef enum {
-        /* name            operands description */
-        OP_NOP,         /*          Absolutely nothing. */
+    /* name            operands description */
+    OP_NOP,         /*          Absolutely nothing. */
 
-        OP_MOVE,        /* A B      R[A] = R[B] */
-        OP_LOADK,       /* A Bx     R[A] = K[Bx] */
-        OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
-        OP_LOADNULL,     /* A        R[A] = null */
-        OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
-        OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */
-        OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
-        OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
+    OP_MOVE,        /* A B      R[A] = R[B] */
+    OP_LOADK,       /* A Bx     R[A] = K[Bx] */
+    OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
+    OP_LOADNULL,     /* A        R[A] = null */
+    OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
+    OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */
+    OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
+    OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
 
-        /* Math ops */
-        OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */
-        OP_SUB,         /* A B C    R[A] = RK[B] - RK[C] */
-        OP_MUL,         /* A B C    R[A] = RK[B] * RK[C] */
-        OP_DIV,         /* A B C    R[A] = RK[B] / RK[C] */
-        OP_POW,         /* A B C    R[A] = RK[B] ** RK[C] */
-        OP_REM,         /* A B C    R[A] = RK[B] % RK[C] */
-        OP_UNM,         /* A B      R[A] = -RK[B] */
+    /* Math ops */
+    OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */
+    OP_SUB,         /* A B C    R[A] = RK[B] - RK[C] */
+    OP_MUL,         /* A B C    R[A] = RK[B] * RK[C] */
+    OP_DIV,         /* A B C    R[A] = RK[B] / RK[C] */
+    OP_POW,         /* A B C    R[A] = RK[B] ** RK[C] */
+    OP_REM,         /* A B C    R[A] = RK[B] % RK[C] */
+    OP_UNM,         /* A B      R[A] = -RK[B] */
 
-        OP_NOT,         /* A B      R[A] = !RK[B] */
+    OP_NOT,         /* A B      R[A] = !RK[B] */
 
-        OP_EQ,          /* A B      if (RK[A] == RK[B]) pc++ */
-        OP_LT,          /* A B      if (RK[A] <  RK[B]) pc++ */
-        OP_GT,          /* A B      if (RK[A] >  RK[B]) pc++ */
-        OP_LE,          /* A B      if (RK[A] <= RK[B]) pc++ */
-        OP_GE,          /* A B      if (RK[A] >= RK[B]) pc++ */
+    OP_EQ,          /* A B      if (RK[A] == RK[B]) pc++ */
+    OP_LT,          /* A B      if (RK[A] <  RK[B]) pc++ */
+    OP_GT,          /* A B      if (RK[A] >  RK[B]) pc++ */
+    OP_LE,          /* A B      if (RK[A] <= RK[B]) pc++ */
+    OP_GE,          /* A B      if (RK[A] >= RK[B]) pc++ */
 
-        OP_JMP,         /* sBx      pc += sBx */
-        OP_RETURN       /* A        return RK[A] */
+    OP_JMP,         /* sBx      pc += sBx */
+    OP_RETURN       /* A        return RK[A] */
 } OpCodes;
 
 /* for OPCODE_ARGS bitmask magic */
