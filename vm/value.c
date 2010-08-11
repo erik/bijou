@@ -5,6 +5,18 @@
 #include <string.h>
 #include <stdio.h>
 
+const TValue *to_number(const TValue *obj, TValue *n)
+{
+    if (ttisnumber(obj))
+        return obj;
+    /* TODO: fix this at some point to be less ugly */
+    if (ttisstring(obj)) {
+        setnumvalue(n, strtod(obj->value.s.ptr, NULL));
+        return n;
+    } else {
+        return NULL;
+    }
+}
 
 /* create a TValue from a number */
 TValue create_bijou_Number(bijou_Number num)
@@ -27,11 +39,20 @@ TValue create_boolean(bijou_Number val)
     ret.value = v;
     return ret;
 }
+
 /* create a TValue with the value of null */
 TValue create_null(void)
 {
     TValue ret;
     ret.tt = BIJOU_TNULL;
+    return ret;
+}
+
+/* return a TValue with the value BIJOU_TNONE */
+TValue create_none(void)
+{
+    TValue ret;
+    ret.tt = BIJOU_TNONE;
     return ret;
 }
 
@@ -73,7 +94,7 @@ char *TValue_to_string(TValue t)
     case BIJOU_TNULL:
         return "NULL";
     case BIJOU_TNUMBER: {
-        char * ca = B_MALLOC(sizeof(char) * 20);
+        char *ca = B_MALLOC(sizeof(char) * 20);
         memset(ca, '\0', 20);
         sprintf(ca, "%f", (double) t.value.n );
         return ca;

@@ -70,6 +70,7 @@
 #define CREATE_ABx(o,a,bc)  ((cast(bInst, o)<<POS_OP) \
       | (cast(bInst, a)<<POS_A) \
       | (cast(bInst, bc)<<POS_Bx))
+#define CREATE_AsBx(o, a, sbx) (bInst __i = CREATE_ABx(o, a, 0), SETARG_sBx(__i, sbx), __i  )
 
 /* Macros on RK values */
 
@@ -130,8 +131,20 @@ typedef enum {
     OP_GE,          /* A B      if (RK[A] >= RK[B]) pc++ */
 
     OP_JMP,         /* sBx      pc += sBx */
+    OP_CALL,        /* A B C    R[A] = R[B](R[B + 1], ..., R[B + C]) (see explanation below) */
+    OP_CLOSURE,     /* A Bx     R[A] = FuncProtos[Bx] (see explanation below) */
     OP_RETURN       /* A        return RK[A] */
 } OpCodes;
+
+/* for OP_CALL, a function pointer is expected to be contained in R[B].
+ * C is the number of arguments to pass to the function. R[B] is then
+ * called with values R[B + 1], ..., R[B + C]
+ * the result is stored in R[A]
+*/
+
+/* for OP_CLOSURE, the value loaded into R[A] is the function described
+ * in the local function prototype table at index Bx for use with OP_CALL
+*/
 
 /* for OPCODE_ARGS bitmask magic */
 #define ARG_NONE (1 << 0)
@@ -152,7 +165,7 @@ typedef enum {
  * helper function
  */
 #define OPCODE_ARGS \
-  ARG_NONE, \
+  ARG_NONE,				\
   ARG_A | ARG_B,			\
   ARG_A | ARG_Bx,			\
   ARG_A | ARG_B,			\
@@ -175,6 +188,8 @@ typedef enum {
   ARG_A | ARG_B,			\
   /* ge */ ARG_A | ARG_B,		\
   ARG_sBx,				\
+  ARG_A | ARG_B | ARG_C,		\
+  ARG_A | ARG_Bx,			\
   ARG_A
 
 #define OPCODE_LABELS "nop",			\
@@ -200,6 +215,8 @@ typedef enum {
     "le",					\
     "ge",					\
     "jmp",					\
+    "call",					\
+    "closure",					\
     "return"
 
 #endif /* _BOPCODES_H_ */

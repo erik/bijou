@@ -18,6 +18,7 @@
 #include "config.h"
 
 #define BIJOU_SIGNATURE "\020bij"
+#define BIJOU_VERSION   0x01
 
 #define UNUSED(x)     ((void)(x))
 
@@ -57,10 +58,6 @@ typedef unsigned int bInst;
 /* type of numbers is always float (for now) */
 typedef BIJOU_DOUBLE bijou_Number;
 
-
-struct BijouVM;
-struct BijouFrame;
-
 typedef struct BijouString {
     char *ptr;
     size_t len;
@@ -68,7 +65,7 @@ typedef struct BijouString {
 
 
 typedef union {
-    BijouString s;        /* string */
+    BijouString s;  /* string */
     bijou_Number n; /* number */
     int b;          /* boolean */
 } Value;
@@ -79,8 +76,21 @@ typedef struct bijou_TValue {
     int tt; /* tagged type */
 } TValue;
 
+struct BijouVM;
+struct BijouFrame;
+
+/* function returning a TValue */
+typedef TValue (BijouFunc)(VM, int argc, TValue* argv);
+
+typedef struct BijouFunction {
+    BijouFunc* func;
+    int arity;
+    BijouString name;
+} BijouFunction;
+
+/* TODO: StkId doesn't really have a purpose, and should be removed */
 /* pointer to stack index */
-typedef TValue* StkId;
+//typedef TValue* StkId;
 
 #define ttype(o)        ((o)->tt)
 
@@ -93,10 +103,12 @@ typedef TValue* StkId;
 
 #define isfalse(o)      (ttisnull(o) || (ttisboolean(o) && bvalue(o) == 0))
 
-#define bvalue(o)       check_exp(ttisboolean(o), o->value.b)
+#define bvalue(o)       check_exp(ttisboolean(o), o.value.b)
+#define numvalue(o)     check_exp(ttisnumber(o), o.value.n)
+
 
 /* macros to set values */
-#define setnullvalue(o)     ((o))->tt  = BIJOU_TNULL)
+#define setnullvalue(o)     { (o)->tt  = BIJOU_TNULL; }
 #define setnumvalue(o, x)   { ((o)->tt = BIJOU_TNUMBER); (o)->value.n=(x); }
 #define setboolvalue(o, x)  { ((o)->tt = BIJOU_TBOOLEAN); (o)-value.b=(x); }
 
@@ -107,11 +119,17 @@ typedef TValue* StkId;
 
 typedef struct BijouBlock {
     kvec_t(TValue) k;               /* constants */
-    kvec_t(BijouString) strings;    /* string pool */
     kvec_t(TValue) locals;          /* local variables */
     kvec_t(TValue) upvals;          /* upvalues */
     kvec_t(bInst) code;             /* actual code */
-    size_t regc;                    /* register count */
+    u_byte regc;                    /* register count */
+    u_byte numglobal;
+    u_byte argc;
+    uint32_t linedefined;           /* line number */
+    uint32_t lastlinedefined;
+    char * filename;                /* file name */
+    struct BijouBlock *parent;      /* parent block */
+
 } BijouBlock;
 
 typedef struct BijouFrame {
@@ -119,14 +137,27 @@ typedef struct BijouFrame {
     TValue *upvals;
 } BijouFrame;
 
+/*
+ * Parameters:
+ * vm - may be unused, various uses
+ * p - what to write
+ * s - how much to write
+ * d - FILE* (or something else)
+ */
+typedef int (*bijou_Writer)(struct BijouVM *vm, const void *p, size_t s, void* d);
 
-/* TODO: write me! */
-typedef struct BijouVM {
-    int temp;
-} BijouVM;
+struct LoadState;
+/*
+ * Parameters:
+ * S - LoadState (various usages, may be unused)
+ * b - points to where the result of the read should be stored
+ * size - number of bytes to be read
+ */
+typedef int (*bijou_Reader)(struct LoadState* S, void *b, size_t size);
 
 /* block prototypes */
-BijouBlock *BijouBlock_new(void);
+BijouBlock *BijouBlock_new(BijouBlock*);
+void BijouBlock_destroy(BijouBlock*);
 int BijouBlock_push_const(BijouBlock*, TValue);
 int BijouBlock_push_local(BijouBlock*, TValue);
 int BijouBlock_find_const(BijouBlock*, TValue);
@@ -141,7 +172,9 @@ void BijouBlock_dump(BijouBlock*);
 TValue create_bijou_Number(bijou_Number);
 TValue create_boolean(bijou_Number);
 TValue create_null(void);
+TValue create_none(void);
 TValue create_TValue_string(BijouString);
+const TValue *to_number(const TValue *, TValue *);
 int TValue_equal(TValue, TValue);
 char *TValue_to_string(TValue);
 BijouString TValue_to_BijouString(TValue);
@@ -163,6 +196,11 @@ TValue TValue_num_div(TValue, TValue);
 TValue TValue_num_pow(TValue, TValue);
 TValue TValue_num_rem(TValue, TValue);
 TValue TValue_num_unm(TValue);
+TValue TValue_num_lt(TValue, TValue);
+TValue TValue_num_le(TValue, TValue);
+TValue TValue_num_gt(TValue, TValue);
+TValue TValue_num_ge(TValue, TValue);
 
-
+/* compiler */
+//BijouCompiler *BijouCompiler_new(VM, char*);
 #endif /* _BIJOU_H_ */

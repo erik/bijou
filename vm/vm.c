@@ -3,24 +3,48 @@
 #include "bijou.h"
 #include "internal.h"
 #include "bopcodes.h"
+#include "vm.h"
 
-
-
-const TValue *to_number(const TValue *obj, TValue *n)
+BijouVM *BijouVM_new(size_t numglobals)
 {
-    if (ttisnumber(obj))
-        return obj;
-    /* TODO: fix this at some point to be less ugly */
-    if (ttisstring(obj)) {
-        setnumvalue(n, strtod(obj->value.s.ptr, NULL));
-        return n;
-    } else {
-        return NULL;
+    BijouVM *v = B_ALLOC(BijouVM);
+    v->globals = B_MALLOC(sizeof(TValue) * numglobals);
+    v->numglobals = numglobals;
+    kv_init(v->functions);
+
+    return v;
+}
+
+void BijouVM_destroy(VM)
+{
+    kv_free(vm->functions);
+    B_FREE(vm->globals);
+    B_FREE(vm);
+    vm = NULL;
+}
+
+/*int BijouVM_push_global(VM, TValue val)
+{
+    size_t i;
+    for (i = 0; i < vm->numglobals; ++i) {
+      if (TValue_equal(vm->globals[i], val))
+            return -1;
+        kv_push(TValue, vm->globals, val);
     }
+    return vm->nums - 1;
+    }*/
+
+int BijouVM_find_global(VM, TValue v)
+{
+    size_t i;
+    for (i = 0; i < vm->numglobals; ++i)
+        if (TValue_equal(vm->globals[i], v))
+            return i;
+    return -1;
 }
 
 /* dispatch macros */
-#define NEXT_INST           { (i = *++ip); }
+#define NEXT_INST           { (i = *++pc); }
 #define OP(n)               case OP_##n
 #define DISPATCH            NEXT_INST; break
 
@@ -34,12 +58,15 @@ const TValue *to_number(const TValue *obj, TValue *n)
 #define C                   GETARG_C(i)
 #define Bx                  GETARG_Bx(i)
 #define sBx                 GETARG_sBx(i)
+#define G(x)                (globals[x])
 #define R                   stack
 #define RK(x)               (ISK(x) ? K[x & ~0x100] : R[x])
 #define RETURN(x)           return (x)
 #define dojump(pc, i)       (pc) += (i)
+#define EXIT                return create_none()
 
-void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
+
+TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
 {
     UNUSED(vm);
     UNUSED(argc);
@@ -49,19 +76,17 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
 
     assert(b->code.a && "Null pointer madness!");
 
-    f->stack             = B_MALLOC(sizeof(StkId) * b->regc);
-    bInst *ip            = b->code.a + start;
-    bInst i              = *ip;
+    f->stack             = B_MALLOC(sizeof(TValue) * b->regc);
+    bInst *pc            = b->code.a + start;
+    bInst i              = *pc;
     TValue *locals       = b->locals.a;
     TValue *K            = b->k.a;
-    BijouString *strings = b->strings.a;
     TValue *stack        = f->stack;
+    TValue *globals      = vm->globals;
 
-    UNUSED(strings);
     size_t x = 0;
 
-    /* TODO: this doesn't allow for jumps to happen... */
-    for (x = 0; x < kv_size(b->code); x++) {
+    for (x = 0; pc <= b->code.a + start + kv_size(b->code); x++) {
         /* TODO: GETGLOBAL */
         /* TODO: SETGLOBAL */
         switch (OPCODE) {
@@ -84,35 +109,90 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
             DISPATCH;
         }
         case OP_GETGLOBAL: {
-            printf("TODO: GETGLOBAL\n");
+
+            if (Bx >= vm->numglobals) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access "
+                        "global index %zu (%zu exist)\n", x, "setlocal", Bx, vm->numglobals);
+                EXIT;
+            }
+
+            TValue tvindex = globals[Bx];
+
+            if (! ttisnumber(&tvindex)) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
+                        " global index %zu (type %s) instead of expected %s\n",
+                        x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
+                EXIT;
+            }
+
+            size_t index = (int)TV2BN(tvindex);
+            if (index >= vm->numglobals) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " global index %zu (%zu exist)\n",
+                        x, "setlocal", index, vm->numglobals);
+                EXIT;
+            }
+
+            R[A] = globals[index];
             DISPATCH;
         }
+
         case OP_SETGLOBAL: {
-            printf("TODO: GETGLOBAL\n");
+
+            if (Bx >= vm->numglobals) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " global index %zu (%zu exist)\n",
+                        x, "setlocal",
+                        Bx, vm->numglobals);
+                EXIT;
+            }
+
+            TValue tvindex = globals[Bx];
+
+            if (! ttisnumber(&tvindex)) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
+                        " global index %zu (type %s) instead of expected %s\n",
+                        x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
+                EXIT;
+            }
+
+            size_t index = (int)TV2BN(tvindex);
+            if (index >= vm->numglobals) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to acces"
+                        "s global index %zu (%zu exist)\n",
+                        x, "setlocal", index, vm->numglobals);
+                EXIT;
+            }
+
+            globals[index] = R[A];
             DISPATCH;
         }
+
         case OP_GETLOCAL: {
 
-            if (Bx >= kv_size(b->k)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s) tried to access constant index %d (%d exist)\n",
-                        x, "setlocal", Bx, kv_size(b->k));
-                DISPATCH;
+            if (Bx >= kv_size(b->locals)) {
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " constant index %zu (%zu exist)\n",
+                        x, "setlocal", Bx, kv_size(b->locals));
+                EXIT;
             }
 
             TValue tvindex = K[Bx];
 
             if (! ttisnumber(&tvindex)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s) tried to use constant index %d (type %s) instead of expected %s\n",
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
+                        " constant index %zu (type %s) instead of expected %s\n",
                         x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
-                DISPATCH;
+                EXIT;
             }
 
             size_t index = (int)TV2BN(tvindex);
             if (index >= kv_size(b->locals)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s)] tried to access local index %d (%d exist)\n",
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " local index %zu (%zu exist)\n",
                         x, "setlocal", index, kv_size(b->locals));
-                DISPATCH;
-                //return;
+                EXIT;
+
             }
 
             R[A] = locals[index];
@@ -122,26 +202,27 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
         case OP_SETLOCAL: {
 
             if (Bx >= kv_size(b->k)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s) tried to access constant index %d (%d exist)\n",
-                        x, "setlocal",
-                        Bx, kv_size(b->k));
-                DISPATCH;
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " constant index %zu (%zu exist)\n",
+                        x, "setlocal", Bx, kv_size(b->k));
+                EXIT;
             }
 
             TValue tvindex = K[Bx];
 
             if (! ttisnumber(&tvindex)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s) tried to use constant index %d (type %s) instead of expected %s\n",
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
+                        " constant index %zu (type %s) instead of expected %s\n",
                         x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
-                DISPATCH;
+                EXIT;
             }
 
             size_t index = (int)TV2BN(tvindex);
             if (index >= kv_size(b->locals)) {
-                fprintf(stderr, "ERROR: [instruction %d (%s)] tried to access local index %d (%d exist)\n",
+                fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
+                        " local index %zu (%zu exist)\n",
                         x, "setlocal", index, kv_size(b->locals));
-                DISPATCH;
-                //return;
+                EXIT;
             }
 
             locals[index] = R[A];
@@ -155,7 +236,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
         case OP_SUB: {
@@ -164,7 +244,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
         case OP_MUL: {
@@ -173,7 +252,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
         case OP_DIV: {
@@ -182,7 +260,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
 
@@ -192,7 +269,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
         case OP_REM: {
@@ -201,7 +277,6 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
         case OP_UNM: {
@@ -210,22 +285,74 @@ void bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TVal
                 DISPATCH;
             }
             R[A] = t;
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
             DISPATCH;
         }
 
         case OP_NOT: {
-            TValue x = RK(B);
-            R[A] = create_boolean(!x.value.b);
-            printf("R[%d] = %s\n", A, TValue_to_string(R[A]));
+            R[A] = create_boolean(! bvalue(RK(B)));
+            DISPATCH;
+        }
+
+        case OP_EQ: {
+            if (TValue_equal(RK(A), RK(B))) {
+                ++pc;
+            }
+            DISPATCH;
+        }
+
+        case OP_LT: {
+            if (bvalue(TValue_num_lt(RK(A), RK(B)))) {
+                ++pc;
+            }
+            DISPATCH;
+        }
+
+        case OP_GT: {
+            if (bvalue(TValue_num_gt(RK(A), RK(B)))) {
+                ++pc;
+            }
+            DISPATCH;
+        }
+
+        case OP_LE: {
+            if (bvalue(TValue_num_le(RK(A), RK(B)))) {
+                ++pc;
+            }
+            DISPATCH;
+        }
+
+        case OP_GE: {
+            if (bvalue(TValue_num_ge(RK(A), RK(B)))) {
+                ++pc;
+            }
+            DISPATCH;
+        }
+
+        case OP_JMP: {
+            dojump(pc, sBx);
+            DISPATCH;
+        }
+
+        case OP_RETURN: {
+            return RK(A);
+        }
+
+        case OP_CALL: {
+            printf("TODO: OP_CALL\n");
+            DISPATCH;
+        }
+
+        case OP_CLOSURE: {
+            printf("TODO: OP_CLOSURE\n");
             DISPATCH;
         }
 
         default: {
-            printf("Don't know Opcode: %d\n", OPCODE);
-            return;
+            printf("Don't know Opcode: %zu\n", OPCODE);
+            return create_none();
         }
         }
     }
+    return create_none();
 }
 

@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-/* create a new BijouString from the given char * */
+/* create a new BijouString from the given char* */
 BijouString BijouString_new(char * str)
 {
     BijouString bs;
@@ -12,6 +12,8 @@ BijouString BijouString_new(char * str)
     bs.len = strlen(str);
     return bs;
 }
+
+/* create a new BijouString from the given char* */
 /* copies 'from' to the end of 'to' */
 BijouString BijouString_cat(BijouString to, BijouString from)
 {

@@ -7,13 +7,13 @@ compat = true
 #Generate debugging symbols
 debug = true
 
-CC=gcc
-CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) -lm -DGC
+CC=clang
+CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) #-DGC
 INCS= -Ivm -Ivendor/gc/include -Ivendor
 LIBS= ${GC}
 GC= vendor/gc/.libs/libgc.a
-LDFLAGS= 
-SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/bijou.c
+LDFLAGS= -lm
+SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/compiler.c vm/load.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
 
@@ -48,6 +48,10 @@ pretty:
 	@astyle -A4 -n vm/*.[ch] | grep formatted \
 		|| echo "   no changes"
 
+# runs valgrind
+leaktest: ${EXECUTABLE}
+	@valgrind --leak-check=full ./bijou >/dev/null
+
 ${EXECUTABLE}: ${LIBS} ${OBJECTS}
 	@echo " link $(EXECUTABLE)"
 	@${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJECTS} ${LIBS}
@@ -61,6 +65,8 @@ vm/bijou.o: vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h
 vm/block.o: vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
 vm/string.o: vm/string.c vm/bijou.h vm/internal.h vm/vm.h
 vm/number.o: vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
+vm/compiler.o: vm/compiler.c vm/bijou.h vm/internal.h
+vm/load.o: vm/load.c vm/load.h vm/bijou.h vm/vm.h vm/internal.h vm/compiler.h
 
 clean:
 	@echo " cleaning up"

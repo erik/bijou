@@ -4,23 +4,38 @@
 #include "bopcodes.h"
 #include "internal.h"
 #include "bijou.h"
+#include "vendor/kvec.h"
+#include "compiler.h"
 
 static const char * opcode_names[] = { OPCODE_LABELS };
 static const int  opcode_args[] = { OPCODE_ARGS };
 
 static void print_op(bInst);
 
-BijouBlock *BijouBlock_new()
+BijouBlock *BijouBlock_new(BijouBlock *parent)
 {
     BijouBlock *b = B_ALLOC(BijouBlock);
     kv_init(b->k);
     kv_init(b->code);
     kv_init(b->locals);
-    kv_init(b->strings);
+    kv_init(b->upvals);
     b->regc = 0;
-
+    //    b->line = 1;
+    b->filename =  "";
+    b->parent = parent;
     return b;
 }
+
+void BijouBlock_destroy(BijouBlock *b)
+{
+    kv_free(b->k);
+    kv_free(b->locals);
+    kv_free(b->upvals);
+    kv_free(b->code);
+    B_FREE(b);
+    b = NULL;
+}
+
 
 /* push a TValue into constants of block
  * returns index, or -1 if the value has
@@ -77,18 +92,20 @@ int BijouBlock_find_local(BijouBlock *b, TValue v)
     return -1;
 }
 
-/* push a string into the string pool
+/* push a string into the constants
  * returns index
  */
 int BijouBlock_push_string(BijouBlock *b, BijouString string)
 {
-    size_t i;
-    for (i = 0; i < kv_size(b->strings); ++i) {
-        if (BijouString_equal(kv_A(b->strings, i), string))
-            return -1;
-    }
-    kv_push(BijouString, b->strings, string);
-    return kv_size(b->strings) - 1;
+    TValue t;
+    Value v;
+
+    v.s = string;
+
+    t.tt = BIJOU_TSTRING;
+    t.value = v;
+
+    return BijouBlock_push_const(b, t);
 
 }
 
@@ -97,13 +114,18 @@ int BijouBlock_push_string(BijouBlock *b, BijouString string)
  */
 int BijouBlock_find_string(BijouBlock *b, BijouString str)
 {
-    size_t i;
-    for (i = 0; i < kv_size(b->strings); i++) {
-        if (BijouString_equal(str, kv_A(b->strings, i)))
-            return i;
-    }
-    return -1;
+
+    TValue t;
+    Value v;
+
+    v.s = str;
+
+    t.tt = BIJOU_TSTRING;
+    t.value = v;
+
+    return BijouBlock_find_const(b, t);
 }
+
 /* pushes an instruction into the block. returns the index */
 int BijouBlock_push_instruction(BijouBlock *b, bInst inst)
 {
@@ -126,34 +148,36 @@ bInst BijouBlock_fetch_instruction(BijouBlock *b, int index)
  */
 void BijouBlock_dump(BijouBlock *b)
 {
+    char * str;
     size_t x;
     printf("; block at: %p\n", (void *)b);
-    printf("; %d registers\n", (int)b->regc);
+    printf("; %zu registers\n", b->regc);
 
-    printf("; constants (%d)\n", (int)kv_size(b->k));
+    printf("; constants (%zu)\n", kv_size(b->k));
     for (x = 0; x < kv_size(b->k); ++x) {
-        printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->k, x)),
-               TValue_to_string(kv_A(b->k, x)));
+        str = TValue_to_string(kv_A(b->k, x));
+        int s = ttisstring(&kv_A(b->k, x));
+        printf("\t%zu: (%s) %s%s%s\n", x, TValue_type_to_string(kv_A(b->k, x)), s ? "\"" : "",
+               str, s ? "\"" : "");
+
+        if (ttisnumber(&kv_A(b->k, x))) B_FREE(str);
     }
 
-    printf("; strings (%d)\n", (int)kv_size(b->strings));
-    for (x = 0; x < kv_size(b->strings); ++x) {
-        printf("\t%d: \"%s\"\n", (int)x, BijouString_to_cstring(kv_A(b->strings, x)));
-    }
-
-    printf("; locals (%d)\n", (int)kv_size(b->locals));
+    printf("; locals (%zu)\n", kv_size(b->locals));
     for (x = 0; x < kv_size(b->locals); ++x) {
-        printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->locals, x)),
-               TValue_to_string(kv_A(b->locals, x)));
+        str = TValue_to_string(kv_A(b->locals, x));
+        printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->locals, x)), str);
+        if (ttisnumber(&kv_A(b->locals, x))) B_FREE(str);
     }
 
-    printf("; upvals (%d)\n",(int) kv_size(b->upvals));
+    printf("; upvals (%zu)\n", kv_size(b->upvals));
     for (x = 0; x < kv_size(b->upvals); ++x) {
-        printf("\t%d: (%s) %s\n", (int)x, TValue_type_to_string(kv_A(b->upvals, x)),
-               TValue_to_string(kv_A(b->upvals, x)));
+        str = TValue_to_string(kv_A(b->upvals, x));
+        printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->upvals, x)), str);
+        if (ttisnumber(&kv_A(b->upvals, x))) B_FREE(str);
     }
 
-    printf("; code section (%d instructions)\n", (int)kv_size(b->code));
+    printf("; code section (%zu instructions)\n", kv_size(b->code));
     for (x = 0; x < kv_size(b->code); ++x) {
         bInst i = kv_A(b->code, x);
         print_op(i);
@@ -214,6 +238,14 @@ void BijouBlock_dump(BijouBlock *b)
             break;
         case OP_NOT:
             printf("; R[%d] = !RK[%d]", GETARG_A(i), GETARG_B(i));
+            break;
+        case OP_CALL:
+            printf("; R[%d] = R[%d]( ", GETARG_A(i), GETARG_B(i));
+            size_t x;
+            for (x = GETARG_B(i) + 1; x <= GETARG_C(i); ++x) {
+                printf(" R[%zu],", x);
+            }
+            printf("\b)");
             break;
         }
         printf("\n");

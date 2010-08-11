@@ -13,8 +13,8 @@
 #define unlikely(x)       (x)
 #endif
 
-#define B_ALLOC(T)        (T *)B_MALLOC(sizeof(T))
-#define B_ALLOCN(T, N)    (T *)B_MALLOC(sizeof(T) * (N))
+#define B_ALLOC(T)        ((T *)B_MALLOC(sizeof(T)))
+#define B_ALLOCN(T, N)    ((T *)B_MALLOC(sizeof(T) * (N)))
 
 #ifdef DEBUG
 #define bijou_assert(x)   assert(x)
@@ -24,8 +24,4 @@
 
 #define check_exp(check, exp)   (bijou_assert(check), exp)
 
-typedef struct {
-    int x;
-    //  BijouVM *vm;
-} BijouCompiler;
 #endif /* _INTERNAL_H_ */

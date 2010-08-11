@@ -3,3 +3,6 @@
 bijou
 vendor/*.lo
 vendor/libtool
+.emacs.*
+
+*.out
