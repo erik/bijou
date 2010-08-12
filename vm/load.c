@@ -103,6 +103,7 @@ static void LoadConstants(LoadState* S, Proto* f)
         case BIJOU_TSTRING: {
             char * s = LoadString(S);
             *obj = create_TValue_string(BijouString_new(s));
+	    B_FREE(s);
             break;
         }
         default:
@@ -129,7 +130,9 @@ static Proto* LoadFunction(LoadState* S)
 {
     Proto* f = B_ALLOC(Proto);
 
-    f->source = BijouString_new(LoadString(S));
+    char *str = LoadString(S);
+    f->source = BijouString_new(str);
+    B_FREE(str);
 
     f->linedefined = LoadInt(S);
     f->lastlinedefined = LoadInt(S);

@@ -96,19 +96,23 @@ int main(int argc, char ** argv)
     printf("Done.\n");
     fflush(out);
 
+    Proto_destroy(p);
     fclose(out);
 
     out = fopen("b.out", "rb");
-
+    
+    BijouVM_destroy(a);
+    a = BijouVM_new(0);
     printf("Loading bytecode...");
     p = bijou_load(a, b, (bijou_Reader)reader, "b.out", out);
     printf("Done.\n");
 
-    BijouBlock *x = proto_to_block(a, p);
+    BijouBlock_destroy(b);
+    b = proto_to_block(a, p);
     
     printf("Interpretting...");
 
-    TValue val = bijou_interpret(a, frame, x, 0, 0, NULL );
+    TValue val = bijou_interpret(a, frame, b, 0, 0, NULL );
     char * str = TValue_to_string(val);
     printf("Done.\n");
 
