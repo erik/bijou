@@ -110,7 +110,7 @@ typedef struct BijouFunction {
 /* macros to set values */
 #define setnullvalue(o)     { (o)->tt  = BIJOU_TNULL; }
 #define setnumvalue(o, x)   { ((o)->tt = BIJOU_TNUMBER); (o)->value.n=(x); }
-#define setboolvalue(o, x)  { ((o)->tt = BIJOU_TBOOLEAN); (o)-value.b=(x); }
+#define setboolvalue(o, x)  { ((o)->tt = BIJOU_TBOOLEAN); (o)->value.b=(x); }
 
 #define settype(o, t)       { (o)->tt  = t; }
 
@@ -150,10 +150,11 @@ struct LoadState;
 /*
  * Parameters:
  * S - LoadState (various usages, may be unused)
- * b - points to where the result of the read should be stored
+ * b - where to read the bytes
  * size - number of bytes to be read
+ * returns: bytes read
  */
-typedef int (*bijou_Reader)(struct LoadState* S, void *b, size_t size);
+typedef int (*bijou_Reader)(struct LoadState* S, u_byte *b, size_t size);
 
 /* block prototypes */
 BijouBlock *BijouBlock_new(BijouBlock*);

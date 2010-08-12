@@ -9,7 +9,7 @@ BijouString BijouString_new(char * str)
 {
     BijouString bs;
     bs.ptr = str;
-    bs.len = strlen(str);
+    bs.len = str == NULL ? 0 : strlen(str);
     return bs;
 }
 

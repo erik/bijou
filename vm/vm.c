@@ -72,7 +72,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
     UNUSED(argc);
     UNUSED(argv);
 
-    BijouBlock_dump(b);
+//    BijouBlock_dump(b);
 
     assert(b->code.a && "Null pointer madness!");
 

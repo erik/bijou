@@ -3,9 +3,13 @@
 #include "bopcodes.h"
 #include "vm.h"
 #include "compiler.h"
+#include "load.h"
 
 #include <stdlib.h>
 #include <stdio.h>
+
+static int offset = 0;
+
 
 int usage(void)
 {
@@ -19,16 +23,26 @@ static int writer(VM, const void *p, size_t s, void *d)
     return (fwrite(p, s, 1, (FILE*)d) != 1) && (s != 0);
 }
 
+
+static int reader(LoadState* S, u_byte* b, size_t size)
+{
+    size_t i;
+    for (i = 0; i < size; ++i) {
+        int c = fgetc(S->fp);
+        b[i] = c;
+    }
+    return i;
+}
+
 int main(int argc, char ** argv)
 {
     UNUSED(argc);
     UNUSED(argv);
-    printf("SIG: %s\n", BIJOU_SIGNATURE);
 
     BijouVM *a = BijouVM_new(10);
 
     BijouBlock *b = BijouBlock_new(0);
-    BijouBlock_push_const(b, create_bijou_Number(1));
+    BijouBlock_push_const(b, create_bijou_Number(3));
     BijouBlock_push_const(b, create_bijou_Number(2));
     BijouBlock_push_const(b, create_boolean(0));
 
@@ -75,15 +89,34 @@ int main(int argc, char ** argv)
     Proto *p = to_proto(a, b);
     BijouFrame *frame = B_ALLOC(BijouFrame);
 
-    TValue val = bijou_interpret(a, frame, b, 0, 0, NULL );
+    FILE * out = fopen("b.out", "wb+");
+
+    printf("Dumping bytecode...");
+    bijou_dump(a, p, writer, out);
+    printf("Done.\n");
+    fflush(out);
+
+    fclose(out);
+
+    out = fopen("b.out", "rb");
+
+    printf("Loading bytecode...");
+    p = bijou_load(a, b, (bijou_Reader)reader, "b.out", out);
+    printf("Done.\n");
+
+    BijouBlock *x = proto_to_block(a, p);
+
+    printf("Interpretting...");
+
+    TValue val = bijou_interpret(a, frame, x, 0, 0, NULL );
     char * str = TValue_to_string(val);
+    printf("Done.\n");
+
     printf("Interpret returned: %s\n", str);
 
     if (ttisnumber(&val)) B_FREE(str);
 
-    FILE * out = fopen("b.out", "w");
 
-    bijou_dump(a, p, writer, out);
     fclose(out);
     BijouBlock_destroy(b);
     BijouVM_destroy(a);

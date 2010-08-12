@@ -4,6 +4,8 @@
 #include "internal.h"
 #include "compiler.h"
 
+#include <string.h>
+
 #define IF(c, s)     if (c) error(S, s);
 #define UNLESS(c, s) IF(!(c), s)
 
@@ -20,8 +22,9 @@ static void error(LoadState* S, const char * msg)
 
 static void LoadBlock(LoadState* S, void* b, size_t size)
 {
-    size_t s = (*S->reader)(S, b, size);
-    UNLESS(s, "Unexpected end of file");
+
+    int s = (*S->reader)(S, b, size);
+    IF(s == EOF, "Unexpected end of file");
 }
 
 static int LoadChar(LoadState* S)
@@ -69,6 +72,7 @@ static void LoadCode(LoadState* S, Proto* f)
     LoadVector(S, f->code, n, sizeof(bInst));
 
 }
+static Proto* LoadFunction(LoadState *S);
 
 static void LoadConstants(LoadState* S, Proto* f)
 {
@@ -81,7 +85,64 @@ static void LoadConstants(LoadState* S, Proto* f)
         setnullvalue(&f->k[i]);
     }
     for (i = 0; i < n; ++i) {
+        TValue* obj = &f->k[i];
+        int type = LoadChar(S);
+
+        switch (type) {
+        case BIJOU_TNULL:
+            setnullvalue(obj);
+            break;
+        case BIJOU_TNUMBER: {
+            bijou_Number n = LoadNumber(S);
+            setnumvalue(obj, n);
+            break;
+        }
+        case BIJOU_TBOOLEAN:
+            setboolvalue(obj, LoadChar(S) != 0);
+            break;
+        case BIJOU_TSTRING: {
+            char * s = LoadString(S);
+            *obj = create_TValue_string(BijouString_new(s));
+            break;
+        }
+        default:
+            fprintf(stderr, "Got: %d\n", type);
+            error(S, "Unknown type");
+            break;
+        }
     }
+
+    n  = LoadInt(S);
+    f->p = B_MALLOC(sizeof(Proto*) * n);
+    f->sizep = n;
+
+    for (i = 0; i < n; ++i) {
+        f->p[i] = NULL;
+    }
+
+    for (i = 0; i < n; ++i) {
+        f->p[i] = LoadFunction(S);
+    }
+}
+
+static Proto* LoadFunction(LoadState* S)
+{
+    Proto* f = B_ALLOC(Proto);
+
+    f->source = BijouString_new(LoadString(S));
+
+    f->linedefined = LoadInt(S);
+    f->lastlinedefined = LoadInt(S);
+
+    f->maxregisters = (u_byte)LoadChar(S);
+    f->numglobal = (u_byte)LoadChar(S);
+
+    f->numupval = (u_byte)LoadChar(S);
+    f->numparam = (u_byte)LoadChar(S);
+    LoadCode(S, f);
+    LoadConstants(S, f);
+
+    return f;
 }
 
 
@@ -93,16 +154,49 @@ static void LoadHeader(LoadState* S)
     make_header(h);
 
     LoadBlock(S, s, BIJOU_HEADERSIZE);
+    IF(memcmp(h, s, BIJOU_HEADERSIZE), "bad header");
 }
 
-Proto* bijou_load(VM, BijouBlock* b, bijou_Reader* reader, const char *name)
+Proto* bijou_load(VM, BijouBlock* b, bijou_Reader reader, const char *name, FILE* fp)
 {
     LoadState S;
     S.name = name;
     S.vm = vm;
     S.block = b;
     S.reader = reader;
+    S.fp = fp;
 
     LoadHeader(&S);
-    return;
+    return LoadFunction(&S);
+}
+
+
+BijouBlock* proto_to_block(VM, Proto* p)
+{
+    size_t i;
+
+    BijouBlock* block = BijouBlock_new(0);
+
+    vm->numglobals = p->numglobal;
+    vm->globals = B_MALLOC(sizeof(TValue) * vm->numglobals);
+
+    block->filename = BijouString_to_cstring(p->source);
+
+    block->linedefined = p->linedefined;
+    block->lastlinedefined = p->linedefined;
+
+    block->regc = p->maxregisters;
+
+    block->argc = p->numparam;
+
+    for (i = 0; i < p->sizek; ++i) {
+        BijouBlock_push_const(block, p->k[i]);
+    }
+
+    for ( i = 0; i < p->sizecode; ++i) {
+        BijouBlock_push_instruction(block, p->code[i]);
+    }
+
+    printf("TODO: PROTO->p\n");
+    return block;
 }

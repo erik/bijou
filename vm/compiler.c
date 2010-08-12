@@ -5,7 +5,7 @@
 /* Bytecode Specification */
 
 /* String format:
-   5 bytes   : string size (including trailing \0)
+   4 bytes   : string size (including trailing \0)
    (variable): bytes (including trailing \0)
 */
 
@@ -39,8 +39,8 @@
        1 byte  : number of globals (ignored if not top level function)
        1 byte  : number of upvals
        1 byte  : number of parameters
-       List    : list of constants (includes function prototpes) (for current function)
        List    : list of instructions (code)
+       List    : list of constants (includes function prototpes) (for current function)
      ]
 */
 
@@ -56,8 +56,9 @@
      1 byte  : number of globals (ignored if not top level function)
      1 byte  : number of upvals
      1 byte  : number of parameters
-     List    : list of constants (for current function)
      List    : list of instructions (code)
+     List    : list of constants (for current function)
+
 */
 
 #include "config.h"
@@ -181,8 +182,8 @@ static void DumpFunction(Proto *p, DumpState *D)
     DumpChar(p->numupval, D);
     DumpChar(p->numparam, D);
 
-    DumpConstants(p, D);
     DumpCode(p, D);
+    DumpConstants(p, D);
 
 }
 
