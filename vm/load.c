@@ -154,7 +154,7 @@ static void LoadHeader(LoadState* S)
     make_header(h);
 
     LoadBlock(S, s, BIJOU_HEADERSIZE);
-    IF(memcmp(h, s, BIJOU_HEADERSIZE), "bad header");
+    IF(memcmp(h, s, BIJOU_HEADERSIZE), "bad header, recompile program");
 }
 
 Proto* bijou_load(VM, BijouBlock* b, bijou_Reader reader, const char *name, FILE* fp)

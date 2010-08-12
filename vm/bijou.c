@@ -105,7 +105,7 @@ int main(int argc, char ** argv)
     printf("Done.\n");
 
     BijouBlock *x = proto_to_block(a, p);
-
+    
     printf("Interpretting...");
 
     TValue val = bijou_interpret(a, frame, x, 0, 0, NULL );

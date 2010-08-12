@@ -2,7 +2,7 @@
 #define _COMPILER_H_
 
 /* size of header file */
-#define BIJOU_HEADERSIZE      5
+#define BIJOU_HEADERSIZE      6
 
 
 #define PUSH_INST_A(BLK, O, A)            BijouBlock_push_instruction(BLK, CREATE_ABC(OP_##O, A, 0, 0))

@@ -45,9 +45,10 @@
 */
 
 /* bytecode format:
-   Header (5 bytes)
+   Header (6 bytes)
      4 bytes : signature (10 62 69 6A) "\16bij"
      1 byte  : version number (example: 0x16, major = 1, minor = 6)
+     1 byte  : endianness
    Top level function (main)
      String  : name of source file
      4 bytes : line defined
@@ -94,9 +95,11 @@ static inline void DumpNumber(bijou_Number x, DumpState *D)
 
 void make_header (char* h)
 {
+    int x = 1;
     memcpy(h, BIJOU_SIGNATURE, sizeof(BIJOU_SIGNATURE) - 1 );
     h += sizeof(BIJOU_SIGNATURE) - 1;
     *h++ = (char)BIJOU_VERSION;
+    *h++ = (char) *(char*)&x;         /* endianness */
 }
 
 static void DumpHeader(DumpState *D)
