@@ -18,19 +18,19 @@ SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/compiler.c vm/
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
 
-ifeq (no_optimize, false)
+ifeq ($(no_optimize), false)
 OPTIMIZE = -O3
 endif
 
-ifeq (true, compat)
+ifeq ($(compat), true)
 CFLAGS += -pedantic
 endif
 
-ifeq (true, debug)
+ifeq ($(debug), true)
 CFLAGS += -g
 endif
 
-ifeq (true, gc)
+ifeq ($(gc), true)
 CFLAGS += -DGC
 INCS = -Ivendor/gc/include -Ivendor
 GC= vendor/gc/.libs/libgc.a
