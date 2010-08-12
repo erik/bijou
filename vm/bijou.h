@@ -88,9 +88,6 @@ typedef struct BijouFunction {
     BijouString name;
 } BijouFunction;
 
-/* TODO: StkId doesn't really have a purpose, and should be removed */
-/* pointer to stack index */
-//typedef TValue* StkId;
 
 #define ttype(o)        ((o)->tt)
 
@@ -128,6 +125,10 @@ typedef struct BijouBlock {
     uint32_t linedefined;           /* line number */
     uint32_t lastlinedefined;
     char * filename;                /* file name */
+
+    u_byte numchildren;
+    struct BijouBlock **children;
+    
     struct BijouBlock *parent;      /* parent block */
 
 } BijouBlock;

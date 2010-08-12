@@ -109,8 +109,10 @@ int main(int argc, char ** argv)
 
     BijouBlock_destroy(b);
     b = proto_to_block(a, p);
+
+    BijouBlock_dump(b);
     
-    printf("Interpretting...");
+    printf("Interpreting...");
 
     TValue val = bijou_interpret(a, frame, b, 0, 0, NULL );
     char * str = TValue_to_string(val);

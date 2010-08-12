@@ -20,9 +20,10 @@ BijouBlock *BijouBlock_new(BijouBlock *parent)
     kv_init(b->locals);
     kv_init(b->upvals);
     b->regc = 0;
-    //    b->line = 1;
     b->filename =  "";
     b->parent = parent;
+    b->numchildren = 0;
+    b->children = NULL;
     return b;
 }
 
@@ -143,48 +144,56 @@ bInst BijouBlock_fetch_instruction(BijouBlock *b, int index)
     return kv_A(b->code, index);
 }
 
+void BijouBlock_dump2(BijouBlock*, int);
+
 /* prints out data contained in BijouBlock b in
  * a human readable format (for debugging, etc.)
  */
 void BijouBlock_dump(BijouBlock *b)
 {
+    BijouBlock_dump2(b, 0);
+}
+
+#define INDENT { int __i; for(__i = 0; __i < level; ++__i) printf("\t"); }
+
+void BijouBlock_dump2(BijouBlock* b, int level)
+{
     char * str;
     size_t x;
-    printf("; block at: %p\n", (void *)b);
-    printf("; %zu registers\n", b->regc);
+    INDENT; printf("; block at: %p, (level %d)\n", (void *)b, level);
+    INDENT; printf("; %zu registers\n", b->regc);
 
-    printf("; constants (%zu)\n", kv_size(b->k));
+    INDENT; printf("; constants (%zu)\n", kv_size(b->k));
     for (x = 0; x < kv_size(b->k); ++x) {
         str = TValue_to_string(kv_A(b->k, x));
         int s = ttisstring(&kv_A(b->k, x));
-        printf("\t%zu: (%s) %s%s%s\n", x, TValue_type_to_string(kv_A(b->k, x)), s ? "\"" : "",
+        INDENT; printf("\t%zu: (%s) %s%s%s\n", x, TValue_type_to_string(kv_A(b->k, x)), s ? "\"" : "",
                str, s ? "\"" : "");
 
         if (ttisnumber(&kv_A(b->k, x))) B_FREE(str);
     }
 
-    printf("; locals (%zu)\n", kv_size(b->locals));
+    INDENT; printf("; locals (%zu)\n", kv_size(b->locals));
     for (x = 0; x < kv_size(b->locals); ++x) {
         str = TValue_to_string(kv_A(b->locals, x));
-        printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->locals, x)), str);
+        INDENT; printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->locals, x)), str);
         if (ttisnumber(&kv_A(b->locals, x))) B_FREE(str);
     }
 
-    printf("; upvals (%zu)\n", kv_size(b->upvals));
+    INDENT; printf("; upvals (%zu)\n", kv_size(b->upvals));
     for (x = 0; x < kv_size(b->upvals); ++x) {
         str = TValue_to_string(kv_A(b->upvals, x));
-        printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->upvals, x)), str);
+        INDENT; printf("\t%zu: (%s) %s\n", x, TValue_type_to_string(kv_A(b->upvals, x)), str);
         if (ttisnumber(&kv_A(b->upvals, x))) B_FREE(str);
     }
 
-    printf("; code section (%zu instructions)\n", kv_size(b->code));
+    INDENT; printf("; code section (%zu instructions)\n", kv_size(b->code));
     for (x = 0; x < kv_size(b->code); ++x) {
         bInst i = kv_A(b->code, x);
         print_op(i);
-        printf("\t");
+        INDENT; printf("\t");
 
-        /* TODO: add some more cases */
-        switch (GET_OPCODE(i)) {
+	switch (GET_OPCODE(i)) {
         case OP_MOVE:
             printf("; R[%d] = R[%d]", GETARG_A(i), GETARG_B(i));
             break;
@@ -249,6 +258,11 @@ void BijouBlock_dump(BijouBlock *b)
             break;
         }
         printf("\n");
+    }
+
+    for(x = 0; x < b->numchildren; ++x)
+    {
+	BijouBlock_dump2(b->children[x], level + 1);
     }
 }
 

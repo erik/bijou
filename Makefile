@@ -1,4 +1,4 @@
-no_optimize= false
+no_optimize= true
 
 #compatibility flags
 compat = true
