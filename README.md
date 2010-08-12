@@ -1,4 +1,4 @@
-#Bijou Vitual Machine
+#Bijou Virtual Machine
 
 A virtual machine, based on Lua and Tinyrb, capable of magic and wonder.
 
