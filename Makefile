@@ -1,32 +1,39 @@
-#Uncomment to compile code unoptimized
-#no_optimize= true
+no_optimize= false
 
-#Comment to get rid of compatibility flags
+#compatibility flags
 compat = true
 
 #Generate debugging symbols
 debug = true
 
+#use garbage collector
+gc = false
+
 CC=clang
-CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) #-DGC
-INCS= -Ivm -Ivendor/gc/include -Ivendor
+CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
+INCS= -Ivm 
 LIBS= ${GC}
-GC= vendor/gc/.libs/libgc.a
 LDFLAGS= -lm
 SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/compiler.c vm/load.c vm/bijou.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=bijou
 
-ifndef no_optimize
+ifeq (no_optimize, false)
 OPTIMIZE = -O3
 endif
 
-ifdef compat
+ifeq (true, compat)
 CFLAGS += -pedantic
 endif
 
-ifdef debug
+ifeq (true, debug)
 CFLAGS += -g
+endif
+
+ifeq (true, gc)
+CFLAGS += -DGC
+INCS = -Ivendor/gc/include -Ivendor
+GC= vendor/gc/.libs/libgc.a
 endif
 
 all:  $(EXECUTABLE)

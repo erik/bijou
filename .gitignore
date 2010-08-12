@@ -2,7 +2,7 @@
 *.o
 bijou
 vendor/*.lo
-vendor/libtool
+vendor/*
 .emacs.*
 
 *.out
