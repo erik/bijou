@@ -8,9 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static int offset = 0;
-
-
 int usage(void)
 {
     printf("\nUsage: \n\tFIXME: write\n");
@@ -100,7 +97,7 @@ int main(int argc, char ** argv)
     fclose(out);
 
     out = fopen("b.out", "rb");
-    
+
     BijouVM_destroy(a);
     a = BijouVM_new(0);
     printf("Loading bytecode...");
@@ -111,7 +108,7 @@ int main(int argc, char ** argv)
     b = proto_to_block(a, p);
 
     BijouBlock_dump(b);
-    
+
     printf("Interpreting...");
 
     TValue val = bijou_interpret(a, frame, b, 0, 0, NULL );

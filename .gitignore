@@ -1,8 +1,7 @@
 *~
 *.o
 bijou
-vendor/*.lo
-vendor/*
+vendor/gc
 .emacs.*
 
 *.out

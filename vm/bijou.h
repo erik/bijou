@@ -128,7 +128,7 @@ typedef struct BijouBlock {
 
     u_byte numchildren;
     struct BijouBlock **children;
-    
+
     struct BijouBlock *parent;      /* parent block */
 
 } BijouBlock;

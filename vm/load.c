@@ -103,10 +103,10 @@ static void LoadConstants(LoadState* S, Proto* f)
         case BIJOU_TSTRING: {
             char * s = LoadString(S);
             *obj = create_TValue_string(BijouString_new(s));
-	    /* FIXME: freeing s here prevents it from being used elsewhere.
-	     * It prevents a memory leak though.
-	     */
-	    /* B_FREE(s); */
+            /* FIXME: freeing s here prevents it from being used elsewhere.
+             * It prevents a memory leak though.
+             */
+            /* B_FREE(s); */
             break;
         }
         default:
@@ -205,9 +205,9 @@ BijouBlock* proto_to_block(VM, Proto* p)
 
     block->numchildren = p->sizep;
     block->children = B_MALLOC(p->sizep * sizeof(BijouBlock));
-    
+
     for (i = 0; i < p->sizep; ++i) {
-	block->children[i] = proto_to_block(vm, p->p[i]);	
+        block->children[i] = proto_to_block(vm, p->p[i]);
     }
     printf("TODO: PROTO->p\n");
     return block;
