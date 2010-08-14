@@ -70,7 +70,7 @@
 #define CREATE_ABx(o,a,bc)  ((cast(bInst, o)<<POS_OP) \
       | (cast(bInst, a)<<POS_A) \
       | (cast(bInst, bc)<<POS_Bx))
-#define CREATE_AsBx(o, a, sbx) (bInst __i = CREATE_ABx(o, a, 0), SETARG_sBx(__i, sbx), __i  )
+#define CREATE_AsBx(o, a, sbx) {bInst __i = CREATE_ABx(o, a, 0), SETARG_sBx(__i, sbx), __i }
 
 /* Macros on RK values */
 

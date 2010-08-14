@@ -6,7 +6,7 @@
 	.globals 5	; number of globals
 	.upvals 0	; number of upvals
 	.params 0 	; number of parameters
-<HEAD
+<HEAD			
 	
 ; code section
 >CODE
@@ -18,6 +18,7 @@
 
 ; const secton
 >CONST
+	
     1#42
     1#5
     3#"this is a string"
