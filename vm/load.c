@@ -2,7 +2,7 @@
 #include "load.h"
 #include "vm.h"
 #include "internal.h"
-#include "compiler.h"
+#include "dump.h"
 
 #include <string.h>
 

@@ -2,6 +2,7 @@
 
 #include "bijou.h"
 #include "internal.h"
+
 #include <string.h>
 #include <stdio.h>
 

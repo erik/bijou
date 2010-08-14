@@ -14,9 +14,18 @@ CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE)
 INCS= -Ivm 
 LIBS= ${GC}
 LDFLAGS= -lm
-SOURCES= vm/vm.c vm/block.c vm/value.c vm/string.c vm/number.c vm/compiler.c vm/load.c vm/bijou.c
-OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=bijou
+
+ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/compiler.c vm/load.c vm/vm.c
+ALLOBJECTS=$(ALLSOURCES:.c=.o)
+
+VMSOURCES= $(ALLSOURCES) vm/bijou.c
+VMOBJECTS= $(VMSOURCES:.c=.o)
+
+COMPILERSOURCES= $(ALLSOURCES) vm/bijouc.c
+COMPILEROBJECTS= $(COMPILERSOURCES:.c=.o)
+
+VM=bijou
+COMPILER=bijouc
 
 ifeq ($(no_optimize), false)
 OPTIMIZE = -O3
@@ -36,8 +45,11 @@ INCS = -Ivendor/gc/include -Ivendor
 GC= vendor/gc/.libs/libgc.a
 endif
 
-all:  $(EXECUTABLE)
+all:  $(VM) $(COMPILER)
 
+t:
+	@echo $(VMSOURCES)
+	@echo $(VMOBJECTS)
 # count source lines of code
 # requires sloccount
 sloc: 
@@ -56,32 +68,40 @@ pretty:
 		|| echo "   no changes"
 
 # runs valgrind
-leaktest: ${EXECUTABLE}
+leaktest: ${VM}
 	@valgrind --leak-check=full ./bijou >/dev/null
 
-${EXECUTABLE}: ${LIBS} ${OBJECTS}
-	@echo " link $(EXECUTABLE)"
-	@${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${OBJECTS} ${LIBS}
+${VM}: ${LIBS} ${VMOBJECTS}
+	@echo " link $(VM)"
+	@${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${VMOBJECTS} ${LIBS}
+
+${COMPILER}: ${LIBS} ${COMPILEROBJECTS}
+	@echo " link $(COMPILER)"
+	@${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${COMPILEROBJECTS} ${LIBS}
 
 ${GC}:
 	@echo " make gc"
 	@cd vendor/gc && ./configure --disable-threads -q && make -s
 
-vm/vm.o:    vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h
-vm/bijou.o: vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h
-vm/block.o: vm/block.c vm/bijou.h vm/internal.h vm/bopcodes.h
-vm/string.o: vm/string.c vm/bijou.h vm/internal.h vm/vm.h
-vm/number.o: vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
-vm/compiler.o: vm/compiler.c vm/bijou.h vm/internal.h
-vm/load.o: vm/load.c vm/load.h vm/bijou.h vm/vm.h vm/internal.h vm/compiler.h
+vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h vm/dump.h vm/load.h
+vm/bijouc.o:   	vm/bijouc.c vm/bijouc.h vm/internal.h vm/bijou.h vm/compiler.h
+vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h
+vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h
+vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h vm/bopcodes.h
+vm/load.o: 	vm/load.c vm/bijou.h vm/load.h vm/vm.h vm/internal.h vm/dump.h
+vm/number.o: 	vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
+vm/string.o: 	vm/string.c vm/bijou.h vm/internal.h vm/vm.h
+vm/value.o:	vm/value.c vm/bijou.h vm/internal.h
+vm/vm.o:    	vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h vm/vm.h
 
 clean:
 	@echo " cleaning up"
 	@rm -f vm/*.o
 	@rm -f vm/*~
-	@rm -f $(EXECUTABLE)
+	@rm -f $(VM)
+	@rm -f $(COMPILER)
 
-rebuild: clean $(EXECUTABLE)
+rebuild: clean $(VM) $(COMPILER)
 
 
 .c.o:

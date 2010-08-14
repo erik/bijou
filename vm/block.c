@@ -5,7 +5,7 @@
 #include "internal.h"
 #include "bijou.h"
 #include "vendor/kvec.h"
-#include "compiler.h"
+#include "dump.h"
 
 static const char * opcode_names[] = { OPCODE_LABELS };
 static const int  opcode_args[] = { OPCODE_ARGS };

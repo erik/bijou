@@ -2,7 +2,7 @@
 #include "internal.h"
 #include "bopcodes.h"
 #include "vm.h"
-#include "compiler.h"
+#include "dump.h"
 #include "load.h"
 
 #include <stdlib.h>
@@ -106,8 +106,6 @@ int main(int argc, char ** argv)
 
     BijouBlock_destroy(b);
     b = proto_to_block(a, p);
-
-    BijouBlock_dump(b);
 
     printf("Interpreting...");
 
