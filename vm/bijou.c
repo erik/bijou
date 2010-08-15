@@ -103,9 +103,11 @@ int main(int argc, char ** argv)
     if (ttisnumber(&val)) B_FREE(str);
 
     BijouVM_destroy(vm);
+    BijouBlock_destroy(b);
     Proto_destroy(p);
     fclose(in);
-    B_FREE(frame);    
+    B_FREE(frame->stack);
+    B_FREE(frame);
     return 0;
 
 }

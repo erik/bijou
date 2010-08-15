@@ -91,7 +91,6 @@ redo:
 
 int compile_file(FILE* in, FILE* out, unsigned int options)
 {
-    UNUSED(out);
     UNUSED(options);
 
     BijouVM* vm = BijouVM_new(0);
@@ -106,6 +105,10 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
 
     bijou_dump(vm, p, writer, out);
 
+    BijouBlock_destroy(block);
+    BijouVM_destroy(vm);
+    Proto_destroy(p);
+
     return 0;
 }
 
@@ -115,18 +118,24 @@ void compile_header(FILE* file, VM, BijouBlock* b)
 {
     expect(file, ">HEAD");
 
-    char * string = read_next(file);
+    char *string = read_next(file);
 
+    char *tmp;
+    
     int n;
 
     while (!IS(string, "<HEAD")) {
 
         if (IS(string, ".regs")) {
-            n = atoi(read_next(file));
+	    tmp = read_next(file);
+            n = atoi(tmp);
+	    B_FREE(tmp);
             b->regc = n;
             /* printf("Registers: %d\n", n); */
         } else if (IS(string, ".globals")) {
-            n = atoi(read_next(file));
+	    tmp = read_next(file);
+            n = atoi(tmp);
+	    B_FREE(tmp);	    
 
             vm->numglobals = n;
             vm->globals = B_MALLOC(vm->numglobals * sizeof(TValue));
@@ -135,14 +144,18 @@ void compile_header(FILE* file, VM, BijouBlock* b)
 
             /* printf("Globals: %d\n", n); */
         } else if (IS(string, ".upvals")) {
-            n = atoi(read_next(file));
+	    tmp = read_next(file);
+            n = atoi(tmp);
+	    B_FREE(tmp);	    	    
 
             kv_init(b->upvals);
 
             /* printf("Upvals: %d\n", n); */
         } else if (IS(string, ".params")) {
-            n = atoi(read_next(file));
 
+	    tmp = read_next(file);
+            n = atoi(tmp);
+	    B_FREE(tmp);	 
             b->argc = n;
 
             /* printf("Params: %d\n", n); */
@@ -214,6 +227,7 @@ void compile_code(FILE* file, VM, BijouBlock* b)
                 SETARG_C(inst, args[2]);
             }
             BijouBlock_push_instruction(b, inst);
+	    
         }
 
         B_FREE(string);
@@ -262,8 +276,11 @@ void compile_const(FILE* file, VM, BijouBlock* b)
         case BIJOU_TSTRING: {
             strncpy(line, line + 3, strlen(line) - 2);
             line[strlen(line) - 1] = '\0';
-
-            t = create_TValue_string(BijouString_new(line));
+	    
+	    BijouString str = BijouString_new(line);
+	    t = create_TValue_string(str);
+	    
+	    B_FREE(str.ptr);
             break;
         }
 
@@ -274,9 +291,11 @@ void compile_const(FILE* file, VM, BijouBlock* b)
 
         BijouBlock_push_const(b, t);
 
+	
         B_FREE(line);
         line = read_line(file);
     }
+    B_FREE(line);
 
 }
 
@@ -364,7 +383,7 @@ char *read_line(FILE* file)
             return string;
         }
 
-        string = B_REALLOC(string, i + 1);
+	string = B_REALLOC(string, i + 1);
         string[i] = c;
 
         /* read string */
@@ -433,6 +452,7 @@ int *read_args(FILE* file)
         for (i = 0; !isspace((c = fgetc(file))); ++i) {
             if (c == ';') {
                 while (fgetc(file) != '\n') {};
+		B_FREE(arg);
                 return args;
             }
 

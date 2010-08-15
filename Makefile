@@ -69,8 +69,8 @@ pretty:
 
 # runs valgrind
 leaktest: ${VM} ${COMPILER}
-	valgrind --leak-check=full ./bijouc sample/test.s -o val.out
-#	valgrind --leak-check=full ./bijou val.out
+	valgrind --leak-check=full --show-reachable=yes ./bijouc sample/test.s -o val.out
+	valgrind --leak-check=full --show-reachable=yes ./bijou val.out
 
 ${VM}: ${LIBS} ${VMOBJECTS}
 	@echo " link $(VM)"
