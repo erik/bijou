@@ -57,11 +57,17 @@
 #include "vm.h"
 #include "bopcodes.h"
 #include "dump.h"
+#include "bijouc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+static int _debug_ = 0;
+
+#define PRINTDBG(x) if(_debug_) {printf("%s",x);}
+#define PRINTFDBG(x, ...) if(_debug_) {printf(x, __VA_ARGS__);}
 
 
 static int writer(VM, const void *p, size_t s, void *d)
@@ -91,7 +97,9 @@ redo:
 
 int compile_file(FILE* in, FILE* out, unsigned int options)
 {
-    UNUSED(options);
+    if (options & OPT_DEBUG) {
+        _debug_ = 1;
+    }
 
     BijouVM* vm = BijouVM_new(0);
     BijouBlock* block = BijouBlock_new(0);
@@ -103,7 +111,8 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
 
     Proto *p = to_proto(vm, block);
 
-    bijou_dump(vm, p, writer, out);
+    if (! options & OPT_PARSE)
+        bijou_dump(vm, p, writer, out);
 
     BijouBlock_destroy(block);
     BijouVM_destroy(vm);
@@ -116,6 +125,8 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
 
 void compile_header(FILE* file, VM, BijouBlock* b)
 {
+    PRINTDBG("Header\n");
+
     expect(file, ">HEAD");
 
     char *string = read_next(file);
@@ -131,7 +142,7 @@ void compile_header(FILE* file, VM, BijouBlock* b)
             n = atoi(tmp);
             B_FREE(tmp);
             b->regc = n;
-            /* printf("Registers: %d\n", n); */
+            PRINTFDBG("\tRegisters: %d\n", n);
         } else if (IS(string, ".globals")) {
             tmp = read_next(file);
             n = atoi(tmp);
@@ -142,7 +153,7 @@ void compile_header(FILE* file, VM, BijouBlock* b)
 
             b->numglobal = n;
 
-            /* printf("Globals: %d\n", n); */
+            PRINTFDBG("\tGlobals: %d\n", n);
         } else if (IS(string, ".upvals")) {
             tmp = read_next(file);
             n = atoi(tmp);
@@ -150,7 +161,7 @@ void compile_header(FILE* file, VM, BijouBlock* b)
 
             kv_init(b->upvals);
 
-            /* printf("Upvals: %d\n", n); */
+            PRINTFDBG("\tUpvals: %d\n", n);
         } else if (IS(string, ".params")) {
 
             tmp = read_next(file);
@@ -158,7 +169,7 @@ void compile_header(FILE* file, VM, BijouBlock* b)
             B_FREE(tmp);
             b->argc = n;
 
-            /* printf("Params: %d\n", n); */
+            PRINTFDBG("\tParams: %d\n", n);
         } else {
             fprintf(stderr, "Don't know \"%s\"\n", string);
             exit(1);
@@ -176,6 +187,8 @@ static const int  opcode_args[] = { OPCODE_ARGS };
 
 void compile_code(FILE* file, VM, BijouBlock* b)
 {
+    PRINTDBG("Code\n");
+
     UNUSED(vm);
 
     expect(file, ">CODE");
@@ -205,7 +218,9 @@ void compile_code(FILE* file, VM, BijouBlock* b)
         } else {
             bInst inst;
 
+            PRINTFDBG("\t%s\t", opcode_names[index]);
             args = read_args(file);
+            PRINTDBG("\n");
 
             typeargs = opcode_args[index];
 
@@ -240,6 +255,8 @@ void compile_code(FILE* file, VM, BijouBlock* b)
 
 void compile_const(FILE* file, VM, BijouBlock* b)
 {
+    PRINTDBG("Const\n");
+
     UNUSED(vm);
 
     expect(file, ">CONST");
@@ -253,6 +270,7 @@ void compile_const(FILE* file, VM, BijouBlock* b)
     line = read_line(file);
 
     while (!IS(line, "<CONST")) {
+        PRINTFDBG("\t%s\n", line);
 
         type = atoi(&line[0]);
 
@@ -433,6 +451,8 @@ int *read_args(FILE* file)
                 break;
             }
         }
+
+        PRINTFDBG("%s ", arg);
 
         /* if constant */
         if (flag) {

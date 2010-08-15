@@ -68,11 +68,8 @@ int BijouVM_find_global(VM, TValue v)
 
 TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
 {
-    UNUSED(vm);
     UNUSED(argc);
     UNUSED(argv);
-
-//    BijouBlock_dump(b);
 
     assert(b->code.a && "Null pointer madness!");
 

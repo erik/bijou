@@ -7,6 +7,6 @@
 
 /* command line switches */
 #define OPT_PARSE (1 << 0)
-
+#define OPT_DEBUG (1 << 1)
 
 #endif /* _BIJOUC_H_ */

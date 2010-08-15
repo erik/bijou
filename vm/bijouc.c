@@ -15,8 +15,8 @@ static int usage()
     fprintf(stderr, "Usage:\nbijouc [options] file\n"
             "-o\tSpecify an output file (default is 'b.out')\n"
             "-v\tOutput version and exit\n"
-            "-p\tParse only, don't generate output"
-            "\n");
+            "-p\tParse only, don't generate output\n"
+            "-d\tDebug, display some extra information\n");
     return 1;
 }
 
@@ -51,6 +51,9 @@ int main(int argc, char **argv)
             case 'p':
                 options |= OPT_PARSE;
                 break;
+            case 'd':
+                options |= OPT_DEBUG;
+                break;
             default:
                 fprintf(stderr, "Unrecognized switch -%c\n", arg[1]);
                 return usage();
@@ -68,7 +71,11 @@ int main(int argc, char **argv)
     }
 
     FILE* in = fopen(inputfile, "rb");
-    FILE* out = fopen(outputfile, "wb");
+    FILE* out;
+
+    if (! (options & OPT_PARSE))
+        out = fopen(outputfile, "wb");
+
     if (in == NULL) {
         fprintf(stderr, "%s: no such file\n", inputfile);
         exit(1);
@@ -76,7 +83,9 @@ int main(int argc, char **argv)
     int value =  compile_file(in, out, options);
 
     fclose(in);
-    fclose(out);
+
+    if (! (options & OPT_PARSE))
+        fclose(out);
 
     return value;
 }

@@ -75,7 +75,7 @@ leaktest: ${VM} ${COMPILER}
 test: ${VM} ${COMPILER}
 	./bijouc sample/test.s -o val.out
 	./bijou val.out
-	@rm -f val.outs
+	@rm -f val.out
 
 ${VM}: ${LIBS} ${VMOBJECTS}
 	@echo " link $(VM)"
@@ -92,7 +92,7 @@ ${GC}:
 vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h vm/dump.h vm/load.h
 vm/bijouc.o:   	vm/bijouc.c vm/bijouc.h vm/internal.h vm/bijou.h vm/compiler.h
 vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h
-vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h vm/dump.h
+vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h vm/dump.h vm/bijouc.h
 vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h vm/bopcodes.h
 vm/load.o: 	vm/load.c vm/bijou.h vm/load.h vm/vm.h vm/internal.h vm/dump.h
 vm/number.o: 	vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
