@@ -9,7 +9,7 @@ debug = true
 #use garbage collector
 gc = false
 
-CC=clang
+CC=gcc
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}
@@ -36,7 +36,7 @@ CFLAGS += -pedantic
 endif
 
 ifeq ($(debug), true)
-CFLAGS += -g
+CFLAGS += -g 
 endif
 
 ifeq ($(gc), true)
@@ -69,8 +69,8 @@ pretty:
 
 # runs valgrind
 leaktest: ${VM} ${COMPILER}
-	valgrind --leak-check=full --show-reachable=yes ./bijouc sample/test.s -o val.out
-	valgrind --leak-check=full --show-reachable=yes ./bijou val.out
+	valgrind -q --leak-check=full --show-reachable=yes ./bijouc sample/test.s -o val.out
+	valgrind -q --leak-check=full --show-reachable=yes ./bijou val.out
 
 test: ${VM} ${COMPILER}
 	./bijouc sample/test.s -o val.out

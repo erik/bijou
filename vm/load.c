@@ -102,11 +102,12 @@ static void LoadConstants(LoadState* S, Proto* f)
             break;
         case BIJOU_TSTRING: {
             char * s = LoadString(S);
-            *obj = create_TValue_string(BijouString_new(s));
-            /* FIXME: freeing s here prevents it from being used elsewhere.
-             * It prevents a memory leak though.
-             */
-            /* B_FREE(s); */
+            BijouString bstr = BijouString_new(s);
+            *obj = create_TValue_string(bstr);
+
+            B_FREE(s);
+            B_FREE(bstr.ptr);
+
             break;
         }
         default:
