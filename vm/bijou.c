@@ -7,17 +7,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int usage(void)
 {
-    printf("\nUsage: \n\tFIXME: write\n");
+    fprintf(stderr, "Usage:\nbijou [options] file\n"
+            "-d\tDump bytecode in human readable format\n"
+            "-v\tDisplay version and exit\n"
+            "-h\tDisplay this help text\n");
     return 1;
-}
-
-static int writer(VM, const void *p, size_t s, void *d)
-{
-    UNUSED(vm);
-    return (fwrite(p, s, 1, (FILE*)d) != 1) && (s != 0);
 }
 
 
@@ -33,98 +31,83 @@ static int reader(LoadState* S, u_byte* b, size_t size)
 
 int main(int argc, char ** argv)
 {
-    UNUSED(argc);
-    UNUSED(argv);
+    char* inputfile = "";
+    int dump = 0;
 
-    BijouVM *a = BijouVM_new(10);
+    int i;
 
-    BijouBlock *b = BijouBlock_new(0);
-    BijouBlock_push_const(b, create_bijou_Number(3));
-    BijouBlock_push_const(b, create_bijou_Number(2));
-    BijouBlock_push_const(b, create_boolean(0));
-
-
-    BijouBlock_push_string(b, BijouString_new("a string"));
-    BijouBlock_push_string(b, BijouString_new("a string"));
-    BijouBlock_push_string(b, BijouString_new("another string"));
-
-    BijouBlock_push_local(b, create_bijou_Number(12));
-    BijouBlock_push_local(b, create_bijou_Number(15));
-    BijouBlock_push_local(b, create_boolean(0));
-
-    /* wild guess for number needed */
-    b->regc = 20;
-
-    b->filename = "omgbytecode";
-    /* fill up block with each opcode and
-     * random args
-     */
-    /*size_t x;
-    for (x = 0; x <= OP_RETURN; ++x) {
-        bInst i = 0;
-        SET_OPCODE(i, x);
-        if (x >= OP_ADD && x <= OP_UNM) {
-            SETARG_A(i, 0);
-            SETARG_B(i, MAKEK(0));
-            SETARG_C(i, MAKEK(0));
-        } else if (x >= OP_EQ && x <= OP_GE) {
-            SETARG_A(i, 0);
-            SETARG_B(i, MAKEK(0));
-        } else if (x == OP_JMP) {
-            SETARG_sBx(i, 0);
-        } else {
-            SETARG_A(i, 2);
-            SETARG_Bx(i, 0);
-        }
-        BijouBlock_push_instruction(b, i);
+    if (argc <= 1) {
+        return usage();
     }
-    */
 
-    BijouBlock_push_instruction(b, CREATE_ABC(OP_ADD, 0, MAKEK(0), MAKEK(1)));
-    BijouBlock_push_instruction(b, CREATE_ABC(OP_RETURN, 0, 0, 0));
+    for (i = 1; i < argc; ++i) {
+        char *arg = argv[i];
 
-    Proto *p = to_proto(a, b);
-    BijouFrame *frame = B_ALLOC(BijouFrame);
+        if (arg[0] == '-') {
+            switch (arg[1]) {
+            case 'd':
+                dump = 1;
+                break;
+            case 'v': {
+                int maj = (BIJOU_VERSION & 0xF0) >> 4;
+                int min = BIJOU_VERSION & 0x0F;
 
-    FILE * out = fopen("b.out", "wb+");
+                printf("Bijou v%X.%X\n", maj, min);
+                exit(0);
+            }
+            case 'h':
+                return usage();
 
-    printf("Dumping bytecode...");
-    bijou_dump(a, p, writer, out);
-    printf("Done.\n");
-    fflush(out);
+            default:
+                fprintf(stderr, "Unrecognized switch -%c\n", arg[1]);
+                return usage();
+            }
+        } else {
+            if (strlen(inputfile))
+                return usage();
 
-    Proto_destroy(p);
-    fclose(out);
+            inputfile = argv[i];
+        }
+    }
 
-    out = fopen("bijou.out", "rb");
+    if (strlen(inputfile) == 0) {
+        return usage();
+    }
 
-    BijouVM_destroy(a);
-    a = BijouVM_new(0);
-    printf("Loading bytecode...");
-    p = bijou_load(a, b, (bijou_Reader)reader, "b.out", out);
-    printf("Done.\n");
+    FILE* in = fopen(inputfile, "rb");
+
+    if (in == NULL) {
+        fprintf(stderr, "%s: no such file\n", inputfile);
+        exit(1);
+    }
+
+    BijouVM* vm = BijouVM_new(0);
+    BijouBlock* b = BijouBlock_new(0);
+    BijouFrame* frame = B_ALLOC(BijouFrame);
+	
+    Proto* p = bijou_load(vm, b, (bijou_Reader)reader, inputfile, in);
 
     BijouBlock_destroy(b);
-    b = proto_to_block(a, p);
 
-    printf("Interpreting...");
+    b = proto_to_block(vm, p);
+    
+    if(dump) {
+	BijouBlock_dump(b);
+    }
 
-    TValue val = bijou_interpret(a, frame, b, 0, 0, NULL );
+    TValue val = bijou_interpret(vm, frame, b, 0, 0, NULL);
     char * str = TValue_to_string(val);
-    printf("Done.\n");
 
     printf("Interpret returned: %s\n", str);
 
     if (ttisnumber(&val)) B_FREE(str);
 
-
-    fclose(out);
-    BijouBlock_destroy(b);
-    BijouVM_destroy(a);
+    BijouVM_destroy(vm);
     Proto_destroy(p);
-    B_FREE(frame->stack);
-    B_FREE(frame);
-    return usage();
+    fclose(in);
+    B_FREE(frame);    
+    return 0;
+
 }
 
 

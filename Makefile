@@ -68,8 +68,9 @@ pretty:
 		|| echo "   no changes"
 
 # runs valgrind
-leaktest: ${VM}
-	@valgrind --leak-check=full ./bijou >/dev/null
+leaktest: ${VM} ${COMPILER}
+	valgrind --leak-check=full ./bijouc sample/test.s -o val.out
+#	valgrind --leak-check=full ./bijou val.out
 
 ${VM}: ${LIBS} ${VMOBJECTS}
 	@echo " link $(VM)"
