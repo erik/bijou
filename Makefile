@@ -72,6 +72,11 @@ leaktest: ${VM} ${COMPILER}
 	valgrind --leak-check=full --show-reachable=yes ./bijouc sample/test.s -o val.out
 	valgrind --leak-check=full --show-reachable=yes ./bijou val.out
 
+test: ${VM} ${COMPILER}
+	./bijouc sample/test.s -o val.out
+	./bijou val.out
+	@rm -f val.outs
+
 ${VM}: ${LIBS} ${VMOBJECTS}
 	@echo " link $(VM)"
 	@${CC} -o $@ ${CFLAGS} ${LDFLAGS} ${VMOBJECTS} ${LIBS}

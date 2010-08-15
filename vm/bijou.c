@@ -84,15 +84,15 @@ int main(int argc, char ** argv)
     BijouVM* vm = BijouVM_new(0);
     BijouBlock* b = BijouBlock_new(0);
     BijouFrame* frame = B_ALLOC(BijouFrame);
-	
+
     Proto* p = bijou_load(vm, b, (bijou_Reader)reader, inputfile, in);
 
     BijouBlock_destroy(b);
 
     b = proto_to_block(vm, p);
-    
-    if(dump) {
-	BijouBlock_dump(b);
+
+    if (dump) {
+        BijouBlock_dump(b);
     }
 
     TValue val = bijou_interpret(vm, frame, b, 0, 0, NULL);

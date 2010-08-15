@@ -35,10 +35,10 @@ void BijouBlock_destroy(BijouBlock *b)
     kv_free(b->code);
 
     size_t i;
-    for(i = 0; i < b->numchildren; ++i){
-	BijouBlock_destroy(b->children[i]);
+    for (i = 0; i < b->numchildren; ++i) {
+        BijouBlock_destroy(b->children[i]);
     }
-    
+
     B_FREE(b);
     b = NULL;
 }
