@@ -56,11 +56,19 @@
 #include "bijou.h"
 #include "vm.h"
 #include "bopcodes.h"
+#include "dump.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+
+static int writer(VM, const void *p, size_t s, void *d)
+{
+    UNUSED(vm);
+    return (fwrite(p, s, 1, (FILE*)d) != 1) && (s != 0);
+}
 
 
 char read_char(FILE* file, int ignore_ws)
@@ -89,9 +97,14 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
     BijouVM* vm = BijouVM_new(0);
     BijouBlock* block = BijouBlock_new(0);
 
+    /* TODO: Need a compile_function function! */
     compile_header(in, vm, block);
     compile_code(in, vm, block);
     compile_const(in, vm, block);
+
+    Proto *p = to_proto(vm, block);
+
+    bijou_dump(vm, p, writer, out);
 
     return 0;
 }
@@ -111,7 +124,7 @@ void compile_header(FILE* file, VM, BijouBlock* b)
         if (IS(string, ".regs")) {
             n = atoi(read_next(file));
             b->regc = n;
-            printf("Registers: %d\n", n);
+            /* printf("Registers: %d\n", n); */
         } else if (IS(string, ".globals")) {
             n = atoi(read_next(file));
 
@@ -120,19 +133,19 @@ void compile_header(FILE* file, VM, BijouBlock* b)
 
             b->numglobal = n;
 
-            printf("Globals: %d\n", n);
+            /* printf("Globals: %d\n", n); */
         } else if (IS(string, ".upvals")) {
             n = atoi(read_next(file));
 
             kv_init(b->upvals);
 
-            printf("upvals: %d\n", n);
+            /* printf("Upvals: %d\n", n); */
         } else if (IS(string, ".params")) {
             n = atoi(read_next(file));
 
             b->argc = n;
 
-            printf("Params: %d\n", n);
+            /* printf("Params: %d\n", n); */
         } else {
             fprintf(stderr, "Don't know \"%s\"\n", string);
             exit(1);
@@ -183,15 +196,23 @@ void compile_code(FILE* file, VM, BijouBlock* b)
 
             typeargs = opcode_args[index];
 
-            if (HASARG_Bx(typeargs))
-                inst = CREATE_ABx(inst, args[0], args[1]);
+            SET_OPCODE(inst, index);
+
+            if (HASARG_Bx(typeargs)) {
+                SETARG_A(inst, args[0]);
+                SETARG_Bx(inst, args[1]);
+            }
+
             else if (HASARG_sBx(typeargs)) {
                 int arg_a = HASARG_A(typeargs) ? args[0] : 0;
                 int arg_sbx = HASARG_A(typeargs) ? args[1] : args[0];
                 SETARG_A(inst, arg_a);
                 SETARG_sBx(inst, arg_sbx);
-            } else
-                inst = CREATE_ABC(inst, args[0], args[1], args[2]);
+            } else {
+                SETARG_A(inst, args[0]);
+                SETARG_B(inst, args[1]);
+                SETARG_C(inst, args[2]);
+            }
             BijouBlock_push_instruction(b, inst);
         }
 
@@ -200,14 +221,63 @@ void compile_code(FILE* file, VM, BijouBlock* b)
 
         string = read_next(file);
     }
-
     B_FREE(string);
 }
 
 void compile_const(FILE* file, VM, BijouBlock* b)
 {
+    UNUSED(vm);
 
     expect(file, ">CONST");
+
+    char* line;
+
+    int type;
+
+    TValue t;
+
+    line = read_line(file);
+
+    while (!IS(line, "<CONST")) {
+
+        type = atoi(&line[0]);
+
+        if (!(line[1] == '#')) {
+            fprintf(stderr, "Error: malformed constant: %s\n", line);
+            exit(1);
+        }
+
+        t.tt = type;
+
+        switch (type) {
+        case BIJOU_TNULL:
+            setnullvalue(&t);
+            break;
+        case BIJOU_TNUMBER:
+            setnumvalue(&t, atol(line + 2));
+            break;
+        case BIJOU_TBOOLEAN:
+            setboolvalue(&t, atoi(line + 2));
+            break;
+        case BIJOU_TSTRING: {
+            strncpy(line, line + 3, strlen(line) - 2);
+            line[strlen(line) - 1] = '\0';
+
+            t = create_TValue_string(BijouString_new(line));
+            break;
+        }
+
+        default:
+            fprintf(stderr, "Unknown type: %d (%s)\n", type, line);
+            exit(1);
+        }
+
+        BijouBlock_push_const(b, t);
+
+        B_FREE(line);
+        line = read_line(file);
+    }
+
 }
 
 void expect(FILE* file, char* str)
@@ -252,13 +322,69 @@ char* read_next(FILE* file)
             exit(1);
         }
 
+
         string = B_REALLOC(string, i + 1);
         string[i] = c;
+
+        /* read string */
+        if (c == '"') {
+            /* TODO: escape sequences */
+            while ((c = fgetc(file)) != '"') {
+                i++;
+                string = B_REALLOC(string, i + 1);
+                string[i] = c;
+            }
+
+            string = B_REALLOC(string, ++i + 1);
+            string[i + 1] = '"';
+        }
 
     }
 
     string[i] = '\0';
     return string;
+}
+
+char *read_line(FILE* file)
+{
+    char* string = B_MALLOC(1 * sizeof(char));
+
+    size_t i;
+    char c;
+
+    /* skip leading whitespace */
+    while (isspace((c = fgetc(file)))) {};
+
+    string[0] = c;
+
+    for (i = 1; (c = fgetc(file)) != '\n'; ++i) {
+
+        if ( c == ';') {
+            while (fgetc(file) != '\n') {} ;
+            return string;
+        }
+
+        string = B_REALLOC(string, i + 1);
+        string[i] = c;
+
+        /* read string */
+        if (c == '"') {
+            /* TODO: escape sequences */
+            while ((c = fgetc(file)) != '"') {
+                i++;
+                string = B_REALLOC(string, i + 1);
+                string[i] = c;
+            }
+
+            string = B_REALLOC(string, i++ + 2);
+            string[i] = '"';
+        }
+    }
+
+    string[i] = '\0';
+
+    return string;
+
 }
 
 int *read_args(FILE* file)

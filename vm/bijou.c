@@ -96,7 +96,7 @@ int main(int argc, char ** argv)
     Proto_destroy(p);
     fclose(out);
 
-    out = fopen("b.out", "rb");
+    out = fopen("bijou.out", "rb");
 
     BijouVM_destroy(a);
     a = BijouVM_new(0);

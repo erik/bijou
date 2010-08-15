@@ -12,7 +12,8 @@ void compile_header(FILE*, struct BijouVM*, struct BijouBlock*);
 void compile_code(FILE*, struct BijouVM*, struct BijouBlock*);
 void compile_const(FILE*, struct BijouVM*, struct BijouBlock*);
 
-/* read the next char (ignores whitespace (if second arg is true)
+/*
+ * read the next char (ignores whitespace (if second arg is true)
  * skips over comments)
  */
 char read_char(FILE*, int);
@@ -28,6 +29,12 @@ char *read_next(FILE*);
  * Will convert constants to proper format
  */
 int *read_args(FILE*);
+
+/*
+ * reads the next line, ignores leading whitespace
+ * and trailing comments
+ */
+char* read_line(FILE*);
 
 void expect(FILE*, char*);
 #endif /* _COMPILER_H_ */

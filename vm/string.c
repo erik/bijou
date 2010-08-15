@@ -8,7 +8,13 @@
 BijouString BijouString_new(char * str)
 {
     BijouString bs;
-    bs.ptr = str;
+
+    if (str == NULL)
+        bs.ptr = NULL;
+    else {
+        bs.ptr = B_MALLOC(strlen(str));
+        strcpy(bs.ptr, str);
+    }
     bs.len = str == NULL ? 0 : strlen(str);
     return bs;
 }
