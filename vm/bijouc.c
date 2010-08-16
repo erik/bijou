@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     }
 
     FILE* in = fopen(inputfile, "rb");
-    FILE* out;
+    FILE* out = NULL;
 
     if (! (options & OPT_PARSE))
         out = fopen(outputfile, "wb");

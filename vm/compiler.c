@@ -197,7 +197,7 @@ void compile_code(FILE* file, VM, BijouBlock* b)
             fprintf(stderr, "Don't know opcode \"%s\"\n", string);
             exit(1);
         } else {
-            bInst inst;
+            bInst inst = 0;
 
             PRINTFDBG("\t%s\t", opcode_names[index]);
             args = read_args(file);
