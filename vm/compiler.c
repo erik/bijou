@@ -76,25 +76,6 @@ static int writer(VM, const void *p, size_t s, void *d)
     return (fwrite(p, s, 1, (FILE*)d) != 1) && (s != 0);
 }
 
-
-char read_char(FILE* file, int ignore_ws)
-{
-    char c;
-
-redo:
-    c = fgetc(file);
-    if (ignore_ws && isspace(c))
-        goto redo;
-
-    /* comment */
-    else if (c == ';') {
-        /* skip until EOL */
-        while ( (c = fgetc(file)) != '\n') {};
-        goto redo;
-    } else
-        return c;
-}
-
 int compile_file(FILE* in, FILE* out, unsigned int options)
 {
     if (options & OPT_DEBUG) {
@@ -317,27 +298,22 @@ void compile_const(FILE* file, VM, BijouBlock* b)
 
 }
 
-void expect(FILE* file, char* str)
+char read_char(FILE* file, int ignore_ws)
 {
-    if (!strlen(str))
-        return;
+    char c;
 
-    char *s = B_MALLOC(sizeof(char) * (strlen(str) + 1));
-    size_t i;
+redo:
+    c = fgetc(file);
+    if (ignore_ws && isspace(c))
+        goto redo;
 
-    s[0] = read_char(file, 1);
-
-    for (i = 1; i < strlen(str); ++i) {
-        s[i] = fgetc(file);
-    }
-
-    s[i] = '\0';
-    if (strcmp(s, str)) {
-        fprintf(stderr, "Expected \"%s\", but got \"%s\"\n", str, s);
-        exit(1);
-    }
-
-    B_FREE(s);
+    /* comment */
+    else if (c == ';') {
+        /* skip until EOL */
+        while ( (c = fgetc(file)) != '\n') {};
+        goto redo;
+    } else
+        return c;
 }
 
 char* read_next(FILE* file)
@@ -491,4 +467,27 @@ int *read_args(FILE* file)
     B_FREE(arg);
 
     return args;
+}
+
+void expect(FILE* file, char* str)
+{
+    if (!strlen(str))
+        return;
+
+    char *s = B_MALLOC(sizeof(char) * (strlen(str) + 1));
+    size_t i;
+
+    s[0] = read_char(file, 1);
+
+    for (i = 1; i < strlen(str); ++i) {
+        s[i] = fgetc(file);
+    }
+
+    s[i] = '\0';
+    if (strcmp(s, str)) {
+        fprintf(stderr, "Expected \"%s\", but got \"%s\"\n", str, s);
+        exit(1);
+    }
+
+    B_FREE(s);
 }

@@ -129,7 +129,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                         x, "getglobal", index, vm->numglobals);
                 EXIT;
             }
-	    
+
             R[A] = globals[index];
             DISPATCH;
         }
