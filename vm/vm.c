@@ -109,16 +109,16 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
 
             if (Bx >= vm->numglobals) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access "
-                        "global index %zu (%zu exist)\n", x, "setlocal", Bx, vm->numglobals);
+                        "global index %zu (%zu exist)\n", x, "getglobal", Bx, vm->numglobals);
                 EXIT;
             }
 
-            TValue tvindex = globals[Bx];
+            TValue tvindex = K[Bx];
 
             if (! ttisnumber(&tvindex)) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
                         " global index %zu (type %s) instead of expected %s\n",
-                        x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
+                        x, "getglobal", Bx, TValue_type_to_string(tvindex), "number");
                 EXIT;
             }
 
@@ -126,10 +126,10 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (index >= vm->numglobals) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
                         " global index %zu (%zu exist)\n",
-                        x, "setlocal", index, vm->numglobals);
+                        x, "getglobal", index, vm->numglobals);
                 EXIT;
             }
-
+	    
             R[A] = globals[index];
             DISPATCH;
         }
@@ -139,17 +139,17 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (Bx >= vm->numglobals) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
                         " global index %zu (%zu exist)\n",
-                        x, "setlocal",
+                        x, "setglobal",
                         Bx, vm->numglobals);
                 EXIT;
             }
 
-            TValue tvindex = globals[Bx];
+            TValue tvindex = K[Bx];
 
             if (! ttisnumber(&tvindex)) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
                         " global index %zu (type %s) instead of expected %s\n",
-                        x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
+                        x, "setglobal", Bx, TValue_type_to_string(tvindex), "number");
                 EXIT;
             }
 
@@ -157,7 +157,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (index >= vm->numglobals) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to acces"
                         "s global index %zu (%zu exist)\n",
-                        x, "setlocal", index, vm->numglobals);
+                        x, "setglobal", index, vm->numglobals);
                 EXIT;
             }
 

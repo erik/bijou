@@ -205,7 +205,7 @@ void compile_code(FILE* file, VM, BijouBlock* b)
         index = -1;
         typeargs = 0;
 
-        for (i = 0; i <= OP_RETURN; ++i) {
+        for (i = 0; i < NUM_OPS; ++i) {
             if (IS(string, opcode_names[i])) {
                 index = i;
                 break;
@@ -437,17 +437,16 @@ int *read_args(FILE* file)
 
     index = 0;
     while (index < 3 ) {
-
-        int flag = 0;
+        int const_flag = 0;
         size_t i;
 
         for (i = 0; i < strlen(arg); ++i) {
             if (!isdigit(arg[i])) {
-                if (arg[i] != 'K') {
+                if ((i != 0 && arg[i] == '-') && arg[i] != 'K') {
                     fprintf(stderr, "Malformed argument: %s\n", arg);
                     exit(1);
                 }
-                flag = 1;
+                if (arg[i] == 'K') const_flag = 1;
                 break;
             }
         }
@@ -455,7 +454,7 @@ int *read_args(FILE* file)
         PRINTFDBG("%s ", arg);
 
         /* if constant */
-        if (flag) {
+        if (const_flag) {
             args[index] = MAKEK(atoi(arg));
         } else {
             args[index] = atoi(arg);
@@ -466,7 +465,11 @@ int *read_args(FILE* file)
         arg = B_MALLOC(1 * sizeof(char));
         char c;
 
-        while (isspace(c = fgetc(file))) {};
+        while (isspace(c = fgetc(file)) && c != '\n') {};
+        if (c == '\n') {
+            B_FREE(arg);
+            return(args);
+        }
         ungetc(c, file);
 
         for (i = 0; !isspace((c = fgetc(file))); ++i) {
@@ -479,6 +482,8 @@ int *read_args(FILE* file)
             arg = B_REALLOC(arg, i + 1);
             arg[i] = c;
         }
+
+        arg[i] = '\0';
 
         index++;
     }

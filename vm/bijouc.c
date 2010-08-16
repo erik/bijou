@@ -16,7 +16,8 @@ static int usage()
             "-o\tSpecify an output file (default is 'b.out')\n"
             "-v\tOutput version and exit\n"
             "-p\tParse only, don't generate output\n"
-            "-d\tDebug, display some extra information\n");
+            "-d\tDebug, display some extra information\n"
+            "-h\tDisplay this help message\n");
     return 1;
 }
 
@@ -54,6 +55,10 @@ int main(int argc, char **argv)
             case 'd':
                 options |= OPT_DEBUG;
                 break;
+
+            case 'h':
+                return usage();
+
             default:
                 fprintf(stderr, "Unrecognized switch -%c\n", arg[1]);
                 return usage();

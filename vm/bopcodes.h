@@ -133,7 +133,8 @@ typedef enum {
     OP_JMP,         /* sBx      pc += sBx */
     OP_CALL,        /* A B C    R[A] = R[B](R[B + 1], ..., R[B + C]) (see explanation below) */
     OP_CLOSURE,     /* A Bx     R[A] = FuncProtos[Bx] (see explanation below) */
-    OP_RETURN       /* A        return RK[A] */
+    OP_RETURN,      /* A        return RK[A] */
+    NUM_OPS         /* Number of opcodes */
 } OpCodes;
 
 /* for OP_CALL, a function pointer is expected to be contained in R[B].
