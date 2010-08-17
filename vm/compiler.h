@@ -8,6 +8,8 @@ int compile_file(FILE*, FILE*, unsigned int);
 struct BijouVM;
 struct BijouBlock;
 
+void compile_function(FILE*, struct BijouVM*, struct BijouBlock*);
+
 void compile_header(FILE*, struct BijouVM*, struct BijouBlock*);
 void compile_code(FILE*, struct BijouVM*, struct BijouBlock*);
 void compile_const(FILE*, struct BijouVM*, struct BijouBlock*);

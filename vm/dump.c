@@ -1,7 +1,3 @@
-/* TODO: most of this stuff should be moved to a separate file, as
- * as 'compiler.c' isn't completely accurate
- */
-
 /* Bytecode Specification */
 
 /* String format:
@@ -158,6 +154,9 @@ static void DumpConstants(Proto *p, DumpState* D)
             DumpString(&o.value.s, D);
             break;
 
+        case BIJOU_TFUNCTION:
+            printf("FIXME: BIJOU_TFUNCTION (dump.c:%d)\n", __LINE__);
+            break;
         default:
             fprintf(stderr, "Unrecognized type!\n");
             break;

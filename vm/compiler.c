@@ -66,6 +66,7 @@
 
 static int _debug_ = 0;
 
+/* TODO: NEED TO INDENT! */
 #define PRINTDBG(x) if(_debug_) {printf("%s",x);}
 #define PRINTFDBG(x, ...) if(_debug_) {printf(x, __VA_ARGS__);}
 
@@ -85,11 +86,10 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
     BijouVM* vm = BijouVM_new(0);
     BijouBlock* block = BijouBlock_new(0);
 
-    /* TODO: Need a compile_function function! */
-    compile_header(in, vm, block);
-    compile_code(in, vm, block);
-    compile_const(in, vm, block);
+    compile_function(in, vm, block);
 
+    BijouBlock_dump(block);
+    
     Proto *p = to_proto(vm, block);
 
     if (! options & OPT_PARSE)
@@ -102,6 +102,12 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
     return 0;
 }
 
+void compile_function(FILE* file, VM, BijouBlock*b)
+{
+    compile_header(file, vm, b);
+    compile_code(file, vm, b);
+    compile_const(file, vm, b);
+}
 #define IS(str, oth) (strcmp((str), (oth)) == 0)
 
 void compile_header(FILE* file, VM, BijouBlock* b)
@@ -251,16 +257,23 @@ void compile_const(FILE* file, VM, BijouBlock* b)
     line = read_line(file);
 
     while (!IS(line, "<CONST")) {
-        PRINTFDBG("\t%s\n", line);
 
         type = atoi(&line[0]);
-
+        if ( line[0] == ';') {
+            B_FREE(line);
+            line = read_line(file);
+            continue;
+        }
         if (!(line[1] == '#')) {
             fprintf(stderr, "Error: malformed constant: %s\n", line);
             exit(1);
         }
 
         t.tt = type;
+
+        if (type != BIJOU_TFUNCTION) {
+            PRINTFDBG("\t%s\n", line);
+        }
 
         switch (type) {
         case BIJOU_TNULL:
@@ -282,6 +295,10 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             B_FREE(str.ptr);
             break;
         }
+
+        case BIJOU_TFUNCTION:
+            compile_function(file, vm, b);
+            break;
 
         default:
             fprintf(stderr, "Unknown type: %d (%s)\n", type, line);
