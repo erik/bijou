@@ -34,4 +34,4 @@ You'll also have to change line 10 of the Makefile to `gc = true`
      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
      GNU General Public License, located in the file 'COPYING' for more details.
 
-khash.h is (c) 2008 Attractive Chaos <http://attractivechaos.awardspace.com/khash.h.html
+kvec.h is (c) 2008 Attractive Chaos <http://attractivechaos.awardspace.com/kvec.h.html>
