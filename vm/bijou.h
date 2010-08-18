@@ -180,7 +180,7 @@ TValue create_bijou_Number(bijou_Number);
 TValue create_boolean(bijou_Number);
 TValue create_null(void);
 TValue create_none(void);
-TValue create_function(BijouFunction);
+TValue create_function(BijouFunction*);
 TValue create_TValue_string(BijouString);
 const TValue *to_number(const TValue *, TValue *);
 int TValue_equal(TValue, TValue);

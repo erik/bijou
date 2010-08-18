@@ -59,12 +59,12 @@ TValue create_none(void)
     return ret;
 }
 
-TValue create_function(BijouFunction func)
+TValue create_function(BijouFunction *func)
 {
     TValue ret;
     Value v;
     ret.tt = BIJOU_TFUNCTION;
-    v.func = &func;
+    v.func = func;
     ret.value = v;
     return ret;
 }

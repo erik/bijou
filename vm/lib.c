@@ -12,8 +12,8 @@
 
 #define setup_func(f, name, arity)  {					\
 	func = BijouFunction_new((BijouFunc*)f, arity, name);	\
-	BijouVM_push_function(vm, *func);			\
-	BijouFunction_destroy(func);				\
+	BijouVM_push_function(vm, func);			\
+	/*	BijouFunction_destroy(func);	*/		\
     }
 
 

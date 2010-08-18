@@ -1,4 +1,4 @@
-no_optimize= true
+no_optimize= false
 
 #compatibility flags
 compat = true
@@ -9,7 +9,7 @@ debug = true
 #use garbage collector
 gc = false
 
-CC=clang
+CC=gcc
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}

@@ -50,10 +50,10 @@ int BijouVM_find_global(VM, TValue v)
     return -1;
 }
 
-int BijouVM_push_function(VM, BijouFunction func)
+int BijouVM_push_function(VM, BijouFunction* func)
 {
     int size = kv_size(vm->functions);
-    kv_push(BijouFunction, vm->functions, func);
+    kv_push(BijouFunction*, vm->functions, func);
     return size;
 
 }
@@ -355,6 +355,10 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
 
             /* built in function */
             if (ISK(Bx)) {
+                if ((Bx & ~0x100) > kv_size(vm->functions)) {
+                    fprintf(stderr, "Tried to access internal function %d (%d exist)\n", Bx, kv_size(vm->functions));
+                    exit(1);
+                }
                 R[A] = create_function(kv_A(vm->functions, Bx & ~0x100));
             }
             DISPATCH;
