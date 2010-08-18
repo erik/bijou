@@ -160,6 +160,21 @@ void BijouBlock_dump(BijouBlock *b)
     BijouBlock_dump2(b, 0);
 }
 
+/*
+ * Push a nested block (function)
+ * returns index at which function is inserted
+ */
+int BijouBlock_push_child(BijouBlock* block, BijouBlock* child)
+{
+    int index = block->numchildren;
+
+    block->numchildren++;
+    block->children = B_REALLOC(block->children, block->numchildren);
+
+    block->children[index] = child;
+    return index;
+}
+
 #define INDENT { int __i; for(__i = 0; __i < level; ++__i) printf("\t"); }
 
 void BijouBlock_dump2(BijouBlock* b, int level)

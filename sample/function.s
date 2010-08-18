@@ -10,12 +10,14 @@
 
 ; code section
 >CODE
-    ; blankxors
+    loadk 0 0 ;
+    return 0  ;
 <CODE
 
 ; const secton
 >CONST
 
+    1#0
     ; a function!
     4#
     >HEAD
@@ -23,12 +25,14 @@
         .upvals  0
         .params 0
     <HEAD
+    
     >CODE
-        loadk 0 0
-        return 0
+        loadk 0 0 ;
+        return 0 ;
     <CODE
+    
     >CONST
         1#42
     <CONST
-    
+        
 <CONST

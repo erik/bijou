@@ -100,7 +100,7 @@ int main(int argc, char ** argv)
 
     printf("Interpret returned: %s\n", str);
 
-    if (ttisnumber(&val)) B_FREE(str);
+    if (ttisnumber(&val) || ttisfunction(&val)) B_FREE(str);
 
     BijouVM_destroy(vm);
     BijouBlock_destroy(b);

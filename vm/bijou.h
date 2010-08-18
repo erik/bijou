@@ -67,6 +67,7 @@ typedef struct BijouString {
 typedef union {
     BijouString s;  /* string */
     bijou_Number n; /* number */
+    struct BijouFunction* func; /* function */
     int b;          /* boolean */
 } Value;
 
@@ -96,7 +97,7 @@ typedef struct BijouFunction {
 #define ttisnumber(o)   (ttype(o) == BIJOU_TNUMBER)
 #define ttisboolean(o)  (ttype(o) == BIJOU_TBOOLEAN)
 #define ttisstring(o)   (ttype(o) == BIJOU_TSTRING)
-#define ttisfunction(o) (ttype(o) == BIJOU_FUNCTION)
+#define ttisfunction(o) (ttype(o) == BIJOU_TFUNCTION)
 
 #define isfalse(o)      (ttisnull(o) || (ttisboolean(o) && bvalue(o) == 0))
 
@@ -168,7 +169,9 @@ int BijouBlock_push_string(BijouBlock*, BijouString);
 int BijouBlock_find_string(BijouBlock*, BijouString);
 int BijouBlock_push_instruction(BijouBlock*, bInst);
 bInst BijouBlock_fetch_instruction(BijouBlock*, int);
+int BijouBlock_push_child(BijouBlock*, BijouBlock*);
 void BijouBlock_dump(BijouBlock*);
+void BijouBlock_dump2(BijouBlock*, int);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);

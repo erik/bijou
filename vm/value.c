@@ -104,8 +104,14 @@ char *TValue_to_string(TValue t)
         return t.value.s.ptr;
     case BIJOU_TBOOLEAN:
         return t.value.b ? "true" : "false";
+    case BIJOU_TFUNCTION: {
+        char *ca = B_MALLOC(sizeof(char) * 20);
+        memset(ca, '\0', 20);
+        sprintf(ca, "%p", (void *)&t.value );
+        return ca;
+    }
     default:
-        return "Nope, not yet";
+        return "Don't know type";
     }
 }
 

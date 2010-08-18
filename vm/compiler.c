@@ -65,10 +65,12 @@
 #include <string.h>
 
 static int _debug_ = 0;
+static size_t _indent_ = 0;
 
-/* TODO: NEED TO INDENT! */
-#define PRINTDBG(x) if(_debug_) {printf("%s",x);}
-#define PRINTFDBG(x, ...) if(_debug_) {printf(x, __VA_ARGS__);}
+#define INDENT { size_t __i; for(__i = 0; __i < _indent_; ++__i) printf("\t"); }
+#define PRINTDBG(x) if(_debug_) { INDENT; printf("%s", x); }
+#define PRINTFDBG(x, ...) if(_debug_) { INDENT; printf(x, __VA_ARGS__); }
+#define NOIND_PRINTFDBG(x, ...) if(_debug_) { printf(x, __VA_ARGS__); }
 
 
 static int writer(VM, const void *p, size_t s, void *d)
@@ -88,8 +90,6 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
 
     compile_function(in, vm, block);
 
-    BijouBlock_dump(block);
-    
     Proto *p = to_proto(vm, block);
 
     if (! options & OPT_PARSE)
@@ -295,10 +295,13 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             B_FREE(str.ptr);
             break;
         }
-
-        case BIJOU_TFUNCTION:
-            compile_function(file, vm, b);
+        case BIJOU_TFUNCTION: {
+            _indent_++;
+            BijouBlock *func = BijouBlock_new(b);
+            compile_function(file, vm, func);
+            BijouBlock_push_child(b, func);
             break;
+        }
 
         default:
             fprintf(stderr, "Unknown type: %d (%s)\n", type, line);
@@ -444,7 +447,7 @@ int *read_args(FILE* file)
             }
         }
 
-        PRINTFDBG("%s ", arg);
+        NOIND_PRINTFDBG("%s ", arg);
 
         /* if constant */
         if (const_flag) {

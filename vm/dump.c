@@ -154,9 +154,10 @@ static void DumpConstants(Proto *p, DumpState* D)
             DumpString(&o.value.s, D);
             break;
 
+            /* handled below, so no need to do anything here */
         case BIJOU_TFUNCTION:
-            printf("FIXME: BIJOU_TFUNCTION (dump.c:%d)\n", __LINE__);
             break;
+
         default:
             fprintf(stderr, "Unrecognized type!\n");
             break;
@@ -231,6 +232,13 @@ Proto* to_proto(VM, BijouBlock *b)
 
     for (i = 0; i < kv_size(b->code); ++i) {
         p->code[i] = kv_A(b->code, i);
+    }
+
+    p->sizep = b->numchildren;
+    p->p = B_MALLOC(sizeof(BijouBlock*) * p->sizep);
+
+    for (i = 0; i < b->numchildren; ++i) {
+        p->p[i] = to_proto(vm, b->children[i]);
     }
 
     return p;

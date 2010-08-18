@@ -71,8 +71,6 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
     UNUSED(argc);
     UNUSED(argv);
 
-    assert(b->code.a && "Null pointer madness!");
-
     f->stack             = B_MALLOC(sizeof(TValue) * b->regc);
     bInst *pc            = b->code.a + start;
     bInst i              = *pc;

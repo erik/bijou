@@ -110,6 +110,9 @@ static void LoadConstants(LoadState* S, Proto* f)
 
             break;
         }
+        /* handled below, so nothing to do here */
+        case BIJOU_TFUNCTION:
+            break;
         default:
             fprintf(stderr, "Got: %d\n", type);
             error(S, "Unknown type");
@@ -210,6 +213,6 @@ BijouBlock* proto_to_block(VM, Proto* p)
     for (i = 0; i < p->sizep; ++i) {
         block->children[i] = proto_to_block(vm, p->p[i]);
     }
-    printf("TODO: PROTO->p\n");
+
     return block;
 }
