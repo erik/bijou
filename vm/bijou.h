@@ -73,21 +73,22 @@ typedef union {
 } Value;
 
 /* tagged value */
-typedef struct bijou_TValue {
+typedef struct TValue {
     Value value;
     int tt; /* tagged type */
 } TValue;
 
 struct BijouVM;
+struct BijouBlock;
 struct BijouFrame;
 
 /* function returning a TValue */
-typedef TValue (BijouFunc)(VM, int argc, TValue* argv);
+typedef TValue (BijouFunc)(VM, struct BijouBlock* b, int argc, TValue* argv);
 
 typedef struct BijouFunction {
     BijouFunc* func;
     int arity;
-    BijouString name;
+    char* name;
 } BijouFunction;
 
 
@@ -179,6 +180,7 @@ TValue create_bijou_Number(bijou_Number);
 TValue create_boolean(bijou_Number);
 TValue create_null(void);
 TValue create_none(void);
+TValue create_function(BijouFunction);
 TValue create_TValue_string(BijouString);
 const TValue *to_number(const TValue *, TValue *);
 int TValue_equal(TValue, TValue);

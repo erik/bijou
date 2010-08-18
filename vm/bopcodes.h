@@ -132,7 +132,7 @@ typedef enum {
     OP_GE,          /* A B      if (RK[A] >= RK[B]) pc++ */
 
     OP_JMP,         /* sBx      pc += sBx */
-    OP_CALL,        /* A B C    R[A] = R[B](R[B + 1], ..., R[B + C]) (see explanation below) */
+    OP_CALL,        /* A B C    R[A] = R[B](R[B + 1], ..., R[B + 1 + C]) (see explanation below) */
     OP_CLOSURE,     /* A Bx     R[A] = FuncProtos[Bx] (see explanation below) */
     OP_RETURN,      /* A        return RK[A] */
     NUM_OPS         /* Number of opcodes */

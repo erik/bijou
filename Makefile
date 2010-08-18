@@ -9,13 +9,14 @@ debug = true
 #use garbage collector
 gc = false
 
-CC=gcc
+CC=clang
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}
 LDFLAGS= -lm
 
-ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/compiler.c vm/load.c vm/vm.c
+ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/func.c \
+vm/compiler.c vm/lib.c vm/load.c vm/vm.c
 ALLOBJECTS=$(ALLSOURCES:.c=.o)
 
 VMSOURCES= $(ALLSOURCES) vm/bijou.c
@@ -89,16 +90,23 @@ ${GC}:
 	@echo " make gc"
 	@cd vendor/gc && ./configure --disable-threads -q && make -s
 
-vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h vm/dump.h vm/load.h
+vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h \
+vm/dump.h vm/load.h
 vm/bijouc.o:   	vm/bijouc.c vm/bijouc.h vm/internal.h vm/bijou.h vm/compiler.h
 vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h
-vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h vm/dump.h vm/bijouc.h
-vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h vm/bopcodes.h
+vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h \
+vm/dump.h vm/bijouc.h
+vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h \
+vm/bopcodes.h
+vm/func.o: 	vm/func.c vm/bijou.h vm/func.h
+vm/lib.o:	vm/lib.c vm/lib.h vm/bijou.h vm/internal.h vm/vm.h vm/func.h
 vm/load.o: 	vm/load.c vm/bijou.h vm/load.h vm/vm.h vm/internal.h vm/dump.h
 vm/number.o: 	vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
 vm/string.o: 	vm/string.c vm/bijou.h vm/internal.h vm/vm.h
 vm/value.o:	vm/value.c vm/bijou.h vm/internal.h
-vm/vm.o:    	vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h vm/vm.h
+vm/vm.o:    	vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h vm/vm.h \
+vm/lib.h vm/func.h
+
 
 clean:
 	@echo " cleaning up"

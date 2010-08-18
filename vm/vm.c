@@ -6,6 +6,9 @@
 #include "internal.h"
 #include "bopcodes.h"
 #include "vm.h"
+#include "lib.h"
+#include "func.h"
+
 
 BijouVM *BijouVM_new(size_t numglobals)
 {
@@ -13,6 +16,8 @@ BijouVM *BijouVM_new(size_t numglobals)
     v->globals = B_MALLOC(sizeof(TValue) * numglobals);
     v->numglobals = numglobals;
     kv_init(v->functions);
+
+    setup_internal_functions(v);
 
     return v;
 }
@@ -45,6 +50,13 @@ int BijouVM_find_global(VM, TValue v)
     return -1;
 }
 
+int BijouVM_push_function(VM, BijouFunction func)
+{
+    int size = kv_size(vm->functions);
+    kv_push(BijouFunction, vm->functions, func);
+    return size;
+
+}
 /* dispatch macros */
 #define NEXT_INST           { (i = *++pc); }
 #define OP(n)               case OP_##n
@@ -335,12 +347,16 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
         }
 
         case OP_CALL: {
-            printf("TODO: OP_CALL\n");
+            R[A] = BijouFunction_call(vm, b, *R[B].value.func, (R + 1) + B, C);
             DISPATCH;
         }
 
         case OP_CLOSURE: {
-            printf("TODO: OP_CLOSURE\n");
+
+            /* built in function */
+            if (ISK(Bx)) {
+                R[A] = create_function(kv_A(vm->functions, Bx & ~0x100));
+            }
             DISPATCH;
         }
 

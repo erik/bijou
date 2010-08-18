@@ -59,6 +59,15 @@ TValue create_none(void)
     return ret;
 }
 
+TValue create_function(BijouFunction func)
+{
+    TValue ret;
+    Value v;
+    ret.tt = BIJOU_TFUNCTION;
+    v.func = &func;
+    ret.value = v;
+    return ret;
+}
 
 /* create a TValue from a BijouString */
 TValue create_TValue_string(BijouString s)
