@@ -24,7 +24,10 @@ BijouVM *BijouVM_new(size_t numglobals)
 
 void BijouVM_destroy(VM)
 {
-    kv_free(vm->functions);
+    size_t i;
+    for(i = 0; i < kv_size(vm->functions); ++i) {
+	BijouFunction_destroy(kv_A(vm->functions, i));
+    }
     B_FREE(vm->globals);
     B_FREE(vm);
     vm = NULL;

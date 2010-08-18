@@ -27,7 +27,7 @@
     loadk 3 0    ; 42
     call 3 2 1   ; R[3] = tan(42)
     
-    return 9     ; tan(42)
+    return 3     ; tan(42)
 
 <CODE
 

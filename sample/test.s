@@ -25,5 +25,4 @@
     1#0
     1#42
     1#5
-    3#"this is a string"
 <CONST

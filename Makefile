@@ -1,4 +1,4 @@
-no_optimize= false
+no_optimize= true
 
 #compatibility flags
 compat = true
@@ -75,6 +75,8 @@ leaktest: ${VM} ${COMPILER}
 
 test: ${VM} ${COMPILER}
 	./bijouc sample/test.s -o val.out
+	./bijou val.out
+	./bijouc sample/call.s -o val.out
 	./bijou val.out
 	@rm -f val.out
 
