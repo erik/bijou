@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #include "bijou.h"
 #include "internal.h"
 #include "bopcodes.h"

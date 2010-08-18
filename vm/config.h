@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 

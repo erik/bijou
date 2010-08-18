@@ -1,3 +1,4 @@
+/* Copyright 2010 Erik Price */
 #ifndef _COMPILER_H_
 #define _COMPILER_H_
 

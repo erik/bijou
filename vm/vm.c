@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #include <stdio.h>
 
 #include "bijou.h"

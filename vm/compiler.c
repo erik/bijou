@@ -1,3 +1,4 @@
+/* Copyright 2010 Erik Price */
 /* (bad) Assembly format */
 
 /*

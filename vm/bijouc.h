@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #ifndef _BIJOUC_H_
 #define _BIJOUC_H_
 

@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #ifndef _INTERNAL_H_
 #define _INTERNAL_H_
 

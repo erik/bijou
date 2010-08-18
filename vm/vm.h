@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #ifndef _VM_H_
 #define _VM_H_
 

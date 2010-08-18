@@ -1,6 +1,7 @@
 /*
  * Various utility definitions and functions for the Bijou virtual Machine
  */
+/* Copyright 2010 Erik Price */
 
 #ifndef _BIJOU_H_
 #define _BIJOU_H_

@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 /* TValue functions */
 
 #include "bijou.h"

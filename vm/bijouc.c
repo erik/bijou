@@ -1,4 +1,5 @@
 /* Bijou assembler */
+/* Copyright 2010 Erik Price */
 
 #include "bijouc.h"
 #include "internal.h"

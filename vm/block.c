@@ -1,6 +1,8 @@
+/* Copyright 2010 Erik Price */
 /* Various functions to create and manipulate
  * structs of type BijouBlock
 */
+
 #include "bopcodes.h"
 #include "internal.h"
 #include "bijou.h"
@@ -220,8 +222,8 @@ void BijouBlock_dump2(BijouBlock* b, int level)
     printf("; code section (%zu instructions)\n", kv_size(b->code));
     for (x = 0; x < kv_size(b->code); ++x) {
         bInst i = kv_A(b->code, x);
-        print_op(i);
         INDENT;
+        print_op(i);
         printf("\t");
 
         switch (GET_OPCODE(i)) {
@@ -290,7 +292,8 @@ void BijouBlock_dump2(BijouBlock* b, int level)
         }
         printf("\n");
     }
-
+    INDENT;
+    printf("; functions (%zu definitions)\n", b->numchildren);
     for (x = 0; x < b->numchildren; ++x) {
         BijouBlock_dump2(b->children[x], level + 1);
     }

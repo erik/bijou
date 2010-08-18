@@ -1,3 +1,5 @@
+/* Copyright 2010 Erik Price */
+
 #ifndef _LOAD_H_
 #define _LOAD_H_
 

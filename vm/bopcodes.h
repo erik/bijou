@@ -1,3 +1,4 @@
+/* Copyright 2010 Erik Price */
 /*
  * Opcodes for the Bijou virtual machine
  */
