@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-int compile_file(FILE*, FILE*, unsigned int);
+int compile_file(FILE*, FILE*, char*, unsigned int);
 
 struct BijouVM;
 struct BijouBlock;

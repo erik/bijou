@@ -107,9 +107,6 @@ static void LoadConstants(LoadState* S, Proto* f)
             BijouString bstr = BijouString_new(s);
             *obj = create_TValue_string(bstr);
 
-            B_FREE(s);
-            B_FREE(bstr.ptr);
-
             break;
         }
         /* handled below, so nothing to do here */
@@ -141,7 +138,6 @@ static Proto* LoadFunction(LoadState* S)
 
     char *str = LoadString(S);
     f->source = BijouString_new(str);
-    B_FREE(str);
 
     f->linedefined = LoadInt(S);
     f->lastlinedefined = LoadInt(S);
@@ -188,6 +184,8 @@ BijouBlock* proto_to_block(VM, Proto* p)
     size_t i;
 
     BijouBlock* block = BijouBlock_new(0);
+
+    block->filename = p->source.ptr;
 
     vm->numglobals = p->numglobal;
     vm->globals = B_MALLOC(sizeof(TValue) * vm->numglobals);

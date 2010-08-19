@@ -80,7 +80,7 @@ static int writer(VM, const void *p, size_t s, void *d)
     return (fwrite(p, s, 1, (FILE*)d) != 1) && (s != 0);
 }
 
-int compile_file(FILE* in, FILE* out, unsigned int options)
+int compile_file(FILE* in, FILE* out, char* filename, unsigned int options)
 {
     if (options & OPT_DEBUG) {
         _debug_ = 1;
@@ -89,6 +89,7 @@ int compile_file(FILE* in, FILE* out, unsigned int options)
     BijouVM* vm = BijouVM_new(0);
     BijouBlock* block = BijouBlock_new(0);
 
+    block->filename = filename;
     compile_function(in, vm, block);
 
     Proto *p = to_proto(vm, block);
@@ -293,7 +294,6 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             BijouString str = BijouString_new(line);
             t = create_TValue_string(str);
 
-            B_FREE(str.ptr);
             break;
         }
         case BIJOU_TFUNCTION: {
@@ -312,7 +312,6 @@ void compile_const(FILE* file, VM, BijouBlock* b)
         BijouBlock_push_const(b, t);
 
 
-        B_FREE(line);
         line = read_line(file);
     }
     B_FREE(line);

@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "%s: no such file\n", inputfile);
         exit(1);
     }
-    int value = compile_file(in, out, options);
+    int value = compile_file(in, out, inputfile, options);
 
     fclose(in);
 

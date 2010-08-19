@@ -94,6 +94,7 @@ int main(int argc, char ** argv)
     b = proto_to_block(vm, p);
 
     if (dump) {
+        printf("; Compiled from: %s\n", b->filename);
         BijouVM_dump_functions(vm);
         BijouBlock_dump(vm, b);
     }
