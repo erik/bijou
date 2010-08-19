@@ -22,11 +22,24 @@ BijouVM *BijouVM_new(size_t numglobals)
     return v;
 }
 
+/* dumps the VM's internal functions */
+void BijouVM_dump_functions(VM)
+{
+
+    printf("; Internal functions:\n");
+
+    size_t i;
+    for (i = 0; i < kv_size(vm->functions); ++i) {
+        BijouFunction *f = kv_A(vm->functions, i);
+        printf("\t%s (arity: %d)\n", f->name, f->arity);
+    }
+}
+
 void BijouVM_destroy(VM)
 {
     size_t i;
-    for(i = 0; i < kv_size(vm->functions); ++i) {
-	BijouFunction_destroy(kv_A(vm->functions, i));
+    for (i = 0; i < kv_size(vm->functions); ++i) {
+        BijouFunction_destroy(kv_A(vm->functions, i));
     }
     B_FREE(vm->globals);
     B_FREE(vm);

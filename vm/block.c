@@ -8,6 +8,7 @@
 #include "bijou.h"
 #include "vendor/kvec.h"
 #include "dump.h"
+#include "vm.h"
 
 static const char * opcode_names[] = { OPCODE_LABELS };
 static const int  opcode_args[] = { OPCODE_ARGS };
@@ -152,14 +153,14 @@ bInst BijouBlock_fetch_instruction(BijouBlock *b, int index)
     return kv_A(b->code, index);
 }
 
-void BijouBlock_dump2(BijouBlock*, int);
+void BijouBlock_dump2(VM, BijouBlock*, int);
 
 /* prints out data contained in BijouBlock b in
  * a human readable format (for debugging, etc.)
  */
-void BijouBlock_dump(BijouBlock *b)
+void BijouBlock_dump(VM, BijouBlock *b)
 {
-    BijouBlock_dump2(b, 0);
+    BijouBlock_dump2(vm, b, 0);
 }
 
 /*
@@ -179,7 +180,7 @@ int BijouBlock_push_child(BijouBlock* block, BijouBlock* child)
 
 #define INDENT { int __i; for(__i = 0; __i < level; ++__i) printf("\t"); }
 
-void BijouBlock_dump2(BijouBlock* b, int level)
+void BijouBlock_dump2(VM, BijouBlock* b, int level)
 {
     char * str;
     size_t x;
@@ -281,13 +282,21 @@ void BijouBlock_dump2(BijouBlock* b, int level)
         case OP_NOT:
             printf("; R[%d] = !RK[%d]", GETARG_A(i), GETARG_B(i));
             break;
+        case OP_CLOSURE:
+            printf("; R[%d] = ", GETARG_A(i));
+            if (ISK(GETARG_Bx(i))) {
+                BijouFunction *func = kv_A(vm->functions, GETARG_Bx(i) & ~0x100);
+                printf("%s\n", func->name);
+            } else
+                printf("closure[%d]\n", GETARG_Bx(i));
+            break;
         case OP_CALL:
-            printf("; R[%d] = R[%d]( ", GETARG_A(i), GETARG_B(i));
+            printf("; R[%d] = R[%d](", GETARG_A(i), GETARG_B(i));
             size_t x;
-            for (x = GETARG_B(i) + 1; x <= GETARG_C(i); ++x) {
-                printf(" R[%zu],", x);
+            for (x = 0; x < GETARG_C(i); ++x) {
+                printf("R[%zu], ", x);
             }
-            printf("\b)");
+            printf("\b\b)");
             break;
         }
         printf("\n");
@@ -295,7 +304,7 @@ void BijouBlock_dump2(BijouBlock* b, int level)
     INDENT;
     printf("; functions (%zu definitions)\n", b->numchildren);
     for (x = 0; x < b->numchildren; ++x) {
-        BijouBlock_dump2(b->children[x], level + 1);
+        BijouBlock_dump2(vm, b->children[x], level + 1);
     }
 }
 

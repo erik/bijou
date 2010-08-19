@@ -172,8 +172,8 @@ int BijouBlock_find_string(BijouBlock*, BijouString);
 int BijouBlock_push_instruction(BijouBlock*, bInst);
 bInst BijouBlock_fetch_instruction(BijouBlock*, int);
 int BijouBlock_push_child(BijouBlock*, BijouBlock*);
-void BijouBlock_dump(BijouBlock*);
-void BijouBlock_dump2(BijouBlock*, int);
+void BijouBlock_dump(struct BijouVM*, BijouBlock*);
+void BijouBlock_dump2(struct BijouVM*, BijouBlock*, int);
 
 /* TValue manipulation functions */
 TValue create_bijou_Number(bijou_Number);

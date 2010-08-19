@@ -9,7 +9,7 @@ debug = true
 #use garbage collector
 gc = false
 
-CC=gcc
+CC=clang
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}
@@ -95,7 +95,8 @@ ${GC}:
 vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h \
 vm/dump.h vm/load.h
 vm/bijouc.o:   	vm/bijouc.c vm/bijouc.h vm/internal.h vm/bijou.h vm/compiler.h
-vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h
+vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h \
+vm/vm.h
 vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h \
 vm/dump.h vm/bijouc.h
 vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h \

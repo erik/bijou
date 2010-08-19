@@ -94,7 +94,8 @@ int main(int argc, char ** argv)
     b = proto_to_block(vm, p);
 
     if (dump) {
-        BijouBlock_dump(b);
+        BijouVM_dump_functions(vm);
+        BijouBlock_dump(vm, b);
     }
 
     TValue val = bijou_interpret(vm, frame, b, 0, 0, NULL);

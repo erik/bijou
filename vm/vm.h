@@ -12,6 +12,7 @@ typedef struct BijouVM {
 } BijouVM;
 
 BijouVM *BijouVM_new(size_t);
+void BijouVM_dump_functions(BijouVM*);
 void BijouVM_destroy(BijouVM*);
 int BijouVM_find_global(BijouVM*, TValue);
 int BijouVM_push_function(BijouVM*, BijouFunction*);
