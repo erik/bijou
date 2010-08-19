@@ -296,7 +296,10 @@ void BijouBlock_dump2(VM, BijouBlock* b, int level)
             for (x = 0; x < GETARG_C(i); ++x) {
                 printf("R[%zu], ", x);
             }
-            printf("\b\b)");
+            if (x > 0) {
+                printf("\b\b");
+            }
+            printf(")");
             break;
         }
         printf("\n");

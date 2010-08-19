@@ -26,8 +26,12 @@
     closure 2 4K ; tan
     loadk 3 0    ; 42
     call 3 2 1   ; R[3] = tan(42)
+
+    closure 2 10K ; randint
+    loadk 3 0     ;
+    call 3 2 1    ;
     
-    return 3     ; tan(42)
+    return 3     ; randint(42)
 
 <CODE
 

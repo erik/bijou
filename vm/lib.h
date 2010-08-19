@@ -8,11 +8,23 @@ struct BijouBlock;
 
 void setup_internal_functions(struct BijouVM*);
 
-struct TValue func_print(struct BijouVM*, struct BijouBlock*, int, struct TValue*);
-struct TValue func_println(struct BijouVM*, struct BijouBlock*, int, struct TValue*);
+#define FUNCTION(name) struct TValue func_##name(struct BijouVM*, struct BijouBlock*, int, struct TValue*)
 
-struct TValue func_sin(struct BijouVM*, struct BijouBlock*, int, struct TValue*);
-struct TValue func_cos(struct BijouVM*, struct BijouBlock*, int, struct TValue*);
-struct TValue func_tan(struct BijouVM*, struct BijouBlock*, int, struct TValue*);
+FUNCTION(print);
+FUNCTION(println);
+
+/* math */
+FUNCTION(sin);
+FUNCTION(cos);
+FUNCTION(tan);
+
+FUNCTION(exp);
+FUNCTION(log);
+
+FUNCTION(ceil);
+FUNCTION(floor);
+
+FUNCTION(rand);
+FUNCTION(rand_int);
 
 #endif /* _LIB_H_ */
