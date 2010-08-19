@@ -5,6 +5,9 @@ A virtual machine, based on Lua and Tinyrb, capable of magic and wonder.
 It's a work in progress, and as of now has it's own (bad) assembly dialect, which
 it can compile to bytecode and run (fairly quickly too!)
 
+To try it out, build it, then compile one of the files in 'sample' (I'd suggest
+not running loop.s though ;) with `./bijouc sample/<file>.s` and then `./bijou b.out`
+
 ##Requirements
 * GCC or Clang (and probably other standard compilers)
 * Make
