@@ -33,7 +33,7 @@
     <CODE
     
     >CONST
-        3#"apple sauce"
+        3#"apple\tabc\nsauce"
     <CONST
         
 <CONST
