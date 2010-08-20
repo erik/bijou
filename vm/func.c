@@ -2,13 +2,17 @@
 
 #include "bijou.h"
 #include "func.h"
+#include "vm.h"
+#include "internal.h"
 
-BijouFunction* BijouFunction_new(BijouFunc* func, int arity, char *name)
+BijouFunction* BijouFunction_new(BijouFunc* func, int arity, char *name, int internal, BijouBlock* b)
 {
     BijouFunction *bf = B_MALLOC(sizeof(BijouFunction));
     bf->func = func;
     bf->arity = arity;
     bf->name = name;
+    bf->internal = internal;
+    bf->block = b;
     return bf;
 }
 
@@ -23,5 +27,12 @@ TValue BijouFunction_call(VM, BijouBlock* b, BijouFunction func, TValue* args, i
         fprintf(stderr, "Wrong number of arguments to %s, (%d for %d)\n", func.name, argc, func.arity);
         exit(0);
     }
-    return (*func.func)(vm, b, argc, args);
+    if (func.internal)
+        return (*func.func)(vm, b, argc, args);
+    else {
+        BijouFrame* frame = B_ALLOC(BijouFrame);
+        TValue result = bijou_interpret(vm, frame, func.block, 0, argc, args);
+        B_FREE(frame);
+        return result;
+    }
 }

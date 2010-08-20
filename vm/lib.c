@@ -14,8 +14,8 @@
 #include <time.h>
 
 #define setup_func(f, name, arity)  {					\
-	func = BijouFunction_new((BijouFunc*)f, arity, name);	\
-	BijouVM_push_function(vm, func);			\
+	func = BijouFunction_new((BijouFunc*)f, arity, name, 1, NULL);	\
+	BijouVM_push_function(vm, func);				\
     }
 
 

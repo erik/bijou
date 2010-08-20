@@ -369,7 +369,13 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
         }
 
         case OP_CALL: {
-            R[A] = BijouFunction_call(vm, b, *R[B].value.func, (R + 1) + B, C);
+            if (! ttisfunction(&R[B])) {
+                fprintf(stderr, "Tried to call something other than a closure\n");
+                exit(1);
+            }
+            BijouFunction *func = R[B].value.func;
+
+            R[A] = BijouFunction_call(vm, b, *func, (R + 1) + B, C);
             DISPATCH;
         }
 
@@ -382,6 +388,15 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                     exit(1);
                 }
                 R[A] = create_function(kv_A(vm->functions, Bx & ~0x100));
+            } else {
+                if (Bx > b->numchildren) {
+                    fprintf(stderr, "Tried to access function %d (%d exist)\n", Bx, b->numchildren);
+                    exit(1);
+                }
+                int index = (int)numvalue(R[Bx]);
+                BijouBlock* block = b->children[index];
+                BijouFunction* func = BijouFunction_new(NULL, block->argc, "<function>", 0, block);
+                R[A] = create_function(func);
             }
             DISPATCH;
         }

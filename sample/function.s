@@ -10,8 +10,9 @@
 
 ; code section
 >CODE
-    loadk 0 0 ;
-    return 0  ;
+    closure 0 0 ;
+    call 1 0 0 ;
+    return 1  ;
 <CODE
 
 ; const secton
@@ -22,7 +23,7 @@
     4#
     >HEAD
         .regs 1
-        .upvals  0
+        .upvals 0
         .params 0
     <HEAD
     
@@ -32,7 +33,7 @@
     <CODE
     
     >CONST
-        1#42
+        3#"apple sauce"
     <CONST
         
 <CONST

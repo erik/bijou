@@ -89,6 +89,8 @@ typedef struct BijouFunction {
     BijouFunc* func;
     int arity;
     char* name;
+    int internal;
+    struct BijouBlock* block;
 } BijouFunction;
 
 

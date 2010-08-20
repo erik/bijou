@@ -110,7 +110,6 @@ int main(int argc, char ** argv)
     BijouBlock_destroy(b);
     Proto_destroy(p);
     fclose(in);
-    B_FREE(frame->stack);
     B_FREE(frame);
     return 0;
 

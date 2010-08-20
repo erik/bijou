@@ -48,9 +48,6 @@ endif
 
 all:  $(VM) $(COMPILER)
 
-t:
-	@echo $(VMSOURCES)
-	@echo $(VMOBJECTS)
 # count source lines of code
 # requires sloccount
 sloc: 
@@ -78,6 +75,8 @@ test: ${VM} ${COMPILER}
 	./bijou val.out
 	./bijouc sample/call.s -o val.out
 	./bijou val.out
+	./bijouc sample/function.s -o val.out
+	./bijou val.out
 	@rm -f val.out
 
 ${VM}: ${LIBS} ${VMOBJECTS}
@@ -101,7 +100,7 @@ vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h \
 vm/dump.h vm/bijouc.h
 vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h \
 vm/bopcodes.h
-vm/func.o: 	vm/func.c vm/bijou.h vm/func.h
+vm/func.o: 	vm/func.c vm/bijou.h vm/func.h vm/vm.h vm/internal.h
 vm/lib.o:	vm/lib.c vm/lib.h vm/bijou.h vm/internal.h vm/vm.h vm/func.h
 vm/load.o: 	vm/load.c vm/bijou.h vm/load.h vm/vm.h vm/internal.h vm/dump.h
 vm/number.o: 	vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
