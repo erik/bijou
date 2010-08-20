@@ -115,57 +115,47 @@ static void DumpString(BijouString *s, DumpState *D)
     else {
         size = s->len + 1;
         char* str = s->ptr;
-        size_t i;
-        for (i = 0; i < size; ++i) {
-            char c;
-            c = s->ptr[i];
-            if ( c == '\\') {
-                i++;
-                if ( i >= size) {
-                    fprintf(stderr, "Unterminated string: %s\n", s->ptr);
-                    exit(1);
-                }
-                c = s->ptr[i];
-                size--;
-                switch (c) {
-                case 'n':
-                    c = '\n';
-                    break;
-                case 'r':
-                    c = '\r';
-                    break;
-                case 't':
-                    c = '\t';
-                    break;
-                case 'a':
-                    c = '\a';
-                    break;
-                case '\\':
-                    c = '\\';
-                    break;
-                default: {
-                    fprintf(stderr, "Unrecognized escape \"\\%c\" in string %s\n", c, s->ptr);
-                    exit(1);
-                }
-                }
-                char *tmp = B_MALLOC(size);
-                size_t x;
-                for (x = 0; x < i - 1; x++) {
-                    tmp[x] = str[x];
-                }
-                tmp[i - 1] = c;
 
-                for (x = ++i; x < size; x++) {
+        char* pch = strchr(str, '\\');
 
-                    tmp[x - 1] = str[x];
-                }
-                tmp[x] = '\0';
-                i += size - i;
-                str = tmp;
+        while (pch != NULL) {
+            size_t i = pch - str;
+            char c = pch[1];
 
-            } else {
-                str[i] = c;
+            if ( i + 1 >= --size) {
+                fprintf(stderr, "Unterminated string: %s\n", str);
+                exit(1);
             }
+
+
+            switch (c) {
+            case 'n':
+                c = '\n';
+                break;
+            case 'r':
+                c = '\r';
+                break;
+            case 't':
+                c = '\t';
+                break;
+            case 'a':
+                c = '\a';
+                break;
+            case '\\':
+                c = '\\';
+                break;
+            default: {
+                fprintf(stderr, "Unrecognized escape \"\\%c\" in string %s\n", c, str);
+                exit(1);
+            }
+            }
+
+            pch[1] = c;
+
+            strcpy(str + i, pch + 1);
+
+            pch = strchr(pch +  2, '\\');
+
         }
         DumpVar(size, D);
         DumpBlock(str, size, D);

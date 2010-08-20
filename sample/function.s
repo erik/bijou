@@ -33,7 +33,7 @@
     <CODE
     
     >CONST
-        3#"apple\tabc\nsauce"
+        3#"\\a\ts\\t\\r\\i\\n\\g"
     <CONST
         
 <CONST
