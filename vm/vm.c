@@ -31,7 +31,13 @@ void BijouVM_dump_functions(VM)
     size_t i;
     for (i = 0; i < kv_size(vm->functions); ++i) {
         BijouFunction *f = kv_A(vm->functions, i);
-        printf("\t%s (arity: %d)\n", f->name, f->arity);
+        printf("\t%s (arity: %d)", f->name, f->arity);
+        if (++i < kv_size(vm->functions)) {
+            f = kv_A(vm->functions, i);
+            printf("   \t%s (arity: %d)", f->name, f->arity);
+        }
+        printf("\n");
+
     }
 }
 
