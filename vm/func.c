@@ -12,6 +12,10 @@ BijouFunction* BijouFunction_new(BijouFunc* func, int arity, char *name, int int
     bf->arity = arity;
     bf->name = name;
     bf->internal = internal;
+    if (! internal) {
+        b->argc = arity;
+        kv_init(b->locals);
+    }
     bf->block = b;
     return bf;
 }

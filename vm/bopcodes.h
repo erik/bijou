@@ -108,11 +108,12 @@ typedef enum {
     OP_MOVE,        /* A B      R[A] = R[B] */
     OP_LOADK,       /* A Bx     R[A] = K[Bx] */
     OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
-    OP_LOADNULL,     /* A        R[A] = null */
+    OP_LOADNULL,    /* A        R[A] = null */
     OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
     OP_SETGLOBAL,   /* A Bx     globals[K[Bx]] = R[A] */
     OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
     OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
+    OP_GETARG,      /* A Bx     R[A] = argv[Bx] */
 
     /* Math ops */
     OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */
@@ -176,6 +177,7 @@ typedef enum {
   ARG_A | ARG_Bx,			\
   ARG_A | ARG_Bx,			\
   ARG_A | ARG_Bx,			\
+  ARG_A | ARG_Bx, 			\
   /* add */ ARG_A | ARG_B | ARG_C,	\
   ARG_A | ARG_B | ARG_C,		\
   ARG_A | ARG_B | ARG_C,		\
@@ -203,6 +205,7 @@ typedef enum {
     "setglobal",				\
     "getlocal",					\
     "setlocal",					\
+    "getarg",	 				\
     "add",					\
     "sub",					\
     "mul",					\

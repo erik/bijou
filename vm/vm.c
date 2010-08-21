@@ -204,7 +204,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (Bx >= kv_size(b->locals)) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
                         " constant index %zu (%zu exist)\n",
-                        x, "setlocal", Bx, kv_size(b->locals));
+                        x, "getlocal", Bx, kv_size(b->locals));
                 EXIT;
             }
 
@@ -213,7 +213,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (! ttisnumber(&tvindex)) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to use"
                         " constant index %zu (type %s) instead of expected %s\n",
-                        x, "setlocal", Bx, TValue_type_to_string(tvindex), "number");
+                        x, "getlocal", Bx, TValue_type_to_string(tvindex), "number");
                 EXIT;
             }
 
@@ -221,7 +221,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             if (index >= kv_size(b->locals)) {
                 fprintf(stderr, "ERROR: [instruction %zu (%s)] tried to access"
                         " local index %zu (%zu exist)\n",
-                        x, "setlocal", index, kv_size(b->locals));
+                        x, "getlocal", index, kv_size(b->locals));
                 EXIT;
 
             }
@@ -259,6 +259,20 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             locals[index] = R[A];
             DISPATCH;
         }
+
+        case OP_GETARG: {
+
+            if ((int)Bx >= argc) {
+                fprintf(stderr, "ERROR: [instruction %zu (getarg) tried to use"
+                        " argument index %zu, (%zu exist)\n",
+                        x, Bx, argc);
+                EXIT;
+            }
+
+            R[A] = argv[Bx];
+            DISPATCH;
+        }
+
 
         /* condense this math section */
         case OP_ADD: {
