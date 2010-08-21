@@ -1,8 +1,8 @@
-    ;; Testing a parameters to nested functions
+    ;; Testing parameters to nested functions
 
 ; function header
 >HEAD
-    .regs 2     ; number of registers needed
+    .regs 3     ; number of registers needed
     .globals 0  ; number of globals
     .upvals 0   ; number of upvals
     .params 0   ; number of parameters
@@ -25,7 +25,7 @@
     ; shhh, unm doesn't exist!
     4#
     >HEAD
-        .regs 2
+        .regs 3
         .upvals 0
         .params 1
     <HEAD

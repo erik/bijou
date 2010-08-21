@@ -23,7 +23,7 @@ You'll also have to change line 10 of the Makefile to `gc = true`
 ##Installation
 1. Clone the repo
 2. run `make`
-3. run `make test` (optional -- this compiles a simple example program to bytecode and runs it)
+3. run `make test` (optional -- this compiles a couple of simple example programs to bytecode and runs them)
 
 ##License
 
