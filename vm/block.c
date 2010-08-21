@@ -24,6 +24,7 @@ BijouBlock *BijouBlock_new(BijouBlock *parent)
     kv_init(b->upvals);
     b->regc = 0;
     b->filename =  "";
+    b->funcname = "";
     b->parent = parent;
     b->numchildren = 0;
     b->children = NULL;
@@ -185,7 +186,7 @@ void BijouBlock_dump2(VM, BijouBlock* b, int level)
     char * str;
     size_t x;
     INDENT;
-    printf("; block at: %p, (level %d)\n", (void *)b, level);
+    printf("; block at: %p, %s (level %d)\n", (void *)b, b->funcname, level);
     INDENT;
     printf("; %zu registers\n", b->regc);
 

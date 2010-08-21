@@ -25,6 +25,7 @@ typedef struct BijouCompiler {
 /* struct representation of bytecode format (for writing bytecode) */
 typedef struct Proto {
     BijouString    source;
+    BijouString    name;
     uint32_t       linedefined;
     uint32_t       lastlinedefined;
     u_byte         maxregisters;

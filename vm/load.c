@@ -139,6 +139,9 @@ static Proto* LoadFunction(LoadState* S)
     char *str = LoadString(S);
     f->source = BijouString_new(str);
 
+    str = LoadString(S);
+    f->name = BijouString_new(str);
+
     f->linedefined = LoadInt(S);
     f->lastlinedefined = LoadInt(S);
 
@@ -186,6 +189,7 @@ BijouBlock* proto_to_block(VM, Proto* p)
     BijouBlock* block = BijouBlock_new(0);
 
     block->filename = p->source.ptr;
+    block->funcname = p->name.ptr;
 
     vm->numglobals = p->numglobal;
     vm->globals = B_MALLOC(sizeof(TValue) * vm->numglobals);

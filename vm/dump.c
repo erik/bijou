@@ -161,6 +161,7 @@ static void DumpConstants(Proto *p, DumpState* D)
 static void DumpFunction(Proto *p, DumpState *D)
 {
     DumpString(&p->source ?  &p->source : NULL , D);
+    DumpString(&p->name, D);
 
     DumpInt(p->linedefined, D);
     DumpInt(p->lastlinedefined, D);
@@ -195,6 +196,8 @@ Proto* to_proto(VM, BijouBlock *b)
     Proto *p = B_ALLOC(Proto);
 
     p->source = BijouString_new(b->filename);
+    p->name = BijouString_new(b->funcname);
+
     p->linedefined = b->linedefined;
     p->lastlinedefined = b->lastlinedefined;
 

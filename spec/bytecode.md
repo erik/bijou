@@ -33,6 +33,7 @@
      4 bytes : number of function prototypes
      [
        String  : name of source file ( length of 0 if not top level function)
+       String  : name of function ('main' for top level)
        4 bytes : line defined
        4 bytes : last line defined
        1 byte  : maximum number of registers needed (for current function)
@@ -54,6 +55,7 @@
    Top level function (main)
 
      String  : name of source file
+     String  : name of function 
      4 bytes : line defined
      4 bytes : last line defined
      1 byte  : maximum number of registers needed (for current function)

@@ -130,6 +130,7 @@ typedef struct BijouBlock {
     uint32_t linedefined;           /* line number */
     uint32_t lastlinedefined;
     char * filename;                /* file name */
+    char * funcname;                /* name of function */
 
     u_byte numchildren;
     struct BijouBlock **children;

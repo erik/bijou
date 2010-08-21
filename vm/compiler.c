@@ -37,6 +37,7 @@ int compile_file(FILE* in, FILE* out, char* filename, unsigned int options)
     BijouBlock* block = BijouBlock_new(0);
 
     block->filename = filename;
+    block->funcname = "main";
     compile_function(in, vm, block);
 
     Proto *p = to_proto(vm, block);
@@ -79,6 +80,10 @@ void compile_header(FILE* file, VM, BijouBlock* b)
             B_FREE(tmp);
             b->regc = n;
             PRINTFDBG("\tRegisters: %d\n", n);
+        }  else if (IS(string, ".name")) {
+            b->funcname = read_next(file);
+
+            PRINTFDBG("\tName: %s\n", b->funcname);
         } else if (IS(string, ".globals")) {
             tmp = read_next(file);
             n = atoi(tmp);
@@ -349,8 +354,15 @@ char *read_line(FILE* file)
 
         /* read string */
         if (c == '"') {
-            /* TODO: escape sequences */
             while ((c = fgetc(file)) != '"') {
+                if (c == EOF) {
+                    fprintf(stderr, "Unexpected EOF while reading string: %s\n",
+                            string);
+                    exit(1);
+                } else if (c == '\n') {
+                    fprintf(stderr, "Unterminated string: %s\n", string);
+                    exit(1);
+                }
                 i++;
                 string = B_REALLOC(string, i + 1);
                 string[i] = c;
