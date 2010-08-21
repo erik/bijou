@@ -289,7 +289,8 @@ void BijouBlock_dump2(VM, BijouBlock* b, int level)
                 BijouFunction *func = kv_A(vm->functions, GETARG_Bx(i) & ~0x100);
                 printf("%s\n", func->name);
             } else
-                printf("closure[%d]\n", GETARG_Bx(i));
+                printf("closure[%d] (%s)\n", GETARG_Bx(i),
+                       b->children[GETARG_Bx(i)]->funcname);
             break;
         case OP_CALL:
             printf("; R[%d] = R[%d](", GETARG_A(i), GETARG_B(i));
