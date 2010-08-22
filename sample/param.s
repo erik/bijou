@@ -25,7 +25,7 @@
     ; shhh, unm doesn't exist!
     4#
     >HEAD
-;        .name invert
+        .name invert
         .regs 3
         .upvals 0
         .params 1

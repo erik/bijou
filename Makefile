@@ -13,7 +13,7 @@ CC=clang
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}
-LDFLAGS= -lm
+LDFLAGS= -lm -ldl
 
 ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/func.c \
 vm/compiler.c vm/lib.c vm/load.c vm/vm.c
@@ -27,10 +27,6 @@ COMPILEROBJECTS= $(COMPILERSOURCES:.c=.o)
 
 VM=bijou
 COMPILER=bijouc
-
-ifeq ("$(shell uname)", "Linux")
-LDFLAGS += -ldl
-endif
 
 ifeq ($(no_optimize), false)
 OPTIMIZE = -O3
