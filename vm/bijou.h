@@ -52,10 +52,6 @@ typedef unsigned int bInst;
 #define BIJOU_TSTRING      (3)
 #define BIJOU_TFUNCTION    (4)
 
-/* TODO!
- * #define BIJOU_TARR         (5)
-*/
-
 /* type of numbers is always float (for now) */
 typedef BIJOU_DOUBLE bijou_Number;
 

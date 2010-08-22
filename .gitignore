@@ -6,3 +6,4 @@ vendor/gc
 
 *.out
 bijouc
+*.so

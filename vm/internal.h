@@ -24,6 +24,21 @@
 #define bijou_assert(x)   ((void) 0)
 #endif
 
+#ifdef __linux
+#include <dlfcn.h>
+#define LIB_LOAD(file)    dlopen(file, RTLD_LAZY)
+#define LIB_READ(h, func) dlsym(h, func)
+#define LIB_CLOSE(func)   dlclose(func)
+#define LIB_ERROR         dlerror()
+#else
+#define LIB_LOAD(x, y) { fprintf(stderr, "Dynamic loading isn't yet supported on your platform\n"); exit(1); }
+#define LIB_READ(x, y) { fprintf(stderr, "Dynamic loading isn't yet supported on your platform\n"); exit(1); }
+#define LIB_CLOSE(x)   { fprintf(stderr, "Dynamic loading isn't yet supported on your platform\n"); exit(1); }
+#define LIB_ERROR      { fprintf(stderr, "Dynamic loading isn't yet supported on your platform\n"); exit(1); }
+#endif
+
+
+
 #define check_exp(check, exp)   (bijou_assert(check), exp)
 
 #endif /* _INTERNAL_H_ */

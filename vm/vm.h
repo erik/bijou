@@ -3,11 +3,11 @@
 #ifndef _VM_H_
 #define _VM_H_
 
-/* TODO: write me! */
 typedef struct BijouVM {
     size_t numglobals;
     TValue* globals;
-    kvec_t(BijouFunction *) functions; /* built in, globally available functions */
+    kvec_t(BijouFunction *) functions; 	/* built in, globally available functions */
+    kvec_t(void *) libs; 		/* names of dynamically linked libs */
 
 } BijouVM;
 
@@ -16,6 +16,7 @@ void BijouVM_dump_functions(BijouVM*);
 void BijouVM_destroy(BijouVM*);
 int BijouVM_find_global(BijouVM*, TValue);
 int BijouVM_push_function(BijouVM*, BijouFunction*);
+int BijouVM_push_lib(BijouVM*, void*);
 TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/);
 
 #endif /* _VM_H_ */

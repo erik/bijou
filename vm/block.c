@@ -186,7 +186,8 @@ void BijouBlock_dump2(VM, BijouBlock* b, int level)
     char * str;
     size_t x;
     INDENT;
-    printf("; block at: %p, %s (level %d)\n", (void *)b, b->funcname, level);
+    printf("; block at: %p, %s (level %d)\n", (void *)b, b->funcname != NULL ?
+           b->funcname : "", level);
     INDENT;
     printf("; %zu registers\n", b->regc);
 
@@ -302,6 +303,11 @@ void BijouBlock_dump2(VM, BijouBlock* b, int level)
                 printf("\b\b");
             }
             printf(")");
+            break;
+
+
+        case OP_GETEXTERNAL:
+            printf("; R[%d] = closure(K[%d])", GETARG_A(i), GETARG_B(i));
             break;
         }
         printf("\n");

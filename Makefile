@@ -28,6 +28,10 @@ COMPILEROBJECTS= $(COMPILERSOURCES:.c=.o)
 VM=bijou
 COMPILER=bijouc
 
+ifeq ("$(shell uname)", "Linux")
+LDFLAGS += -ldl
+endif
+
 ifeq ($(no_optimize), false)
 OPTIMIZE = -O3
 endif
@@ -46,7 +50,7 @@ INCS = -Ivendor/gc/include -Ivendor
 GC= vendor/gc/.libs/libgc.a
 endif
 
-all:  $(VM) $(COMPILER)
+all: $(VM) $(COMPILER) bijoulib 
 
 # count source lines of code
 # requires sloccount
@@ -78,6 +82,9 @@ test: ${VM} ${COMPILER}
 	./bijouc sample/function.s -o val.out
 	./bijou val.out
 	@rm -f val.out
+
+bijoulib: $(wildcard lib/*.so)
+	@cd lib && make
 
 ${VM}: ${LIBS} ${VMOBJECTS}
 	@echo " link $(VM)"
@@ -117,7 +124,7 @@ clean:
 	@rm -f $(VM)
 	@rm -f $(COMPILER)
 
-rebuild: clean $(VM) $(COMPILER)
+rebuild: clean $(VM) $(COMPILER) bijoulib
 
 
 .c.o:

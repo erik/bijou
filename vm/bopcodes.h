@@ -114,6 +114,7 @@ typedef enum {
     OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
     OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
     OP_GETARG,      /* A Bx     R[A] = argv[Bx] */
+    OP_GETEXTERNAL, /* A B      R[A] = function K[B] included libs (see explanation below) */
 
     /* Math ops */
     OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */
@@ -138,6 +139,12 @@ typedef enum {
     OP_RETURN,      /* A        return RK[A] */
     NUM_OPS         /* Number of opcodes */
 } OpCodes;
+
+/*
+ * OP_GETEXTERNAL creates a closure from a dynamically loaded library. The
+ * closure is placed in R[A], and is created from the function in the
+ * loaded libraries with the name contained in K[B]
+ */
 
 /* for OP_CALL, a function pointer is expected to be contained in R[B].
  * C is the number of arguments to pass to the function. R[B] is then
@@ -168,33 +175,34 @@ typedef enum {
  * helper function
  */
 #define OPCODE_ARGS \
-  ARG_NONE,				\
-  ARG_A | ARG_B,			\
-  ARG_A | ARG_Bx,			\
-  ARG_A | ARG_B,			\
-  ARG_A,				\
-  /* getglobal */  ARG_A | ARG_Bx,      \
-  ARG_A | ARG_Bx,			\
-  ARG_A | ARG_Bx,			\
-  ARG_A | ARG_Bx,			\
-  ARG_A | ARG_Bx, 			\
-  /* add */ ARG_A | ARG_B | ARG_C,	\
-  ARG_A | ARG_B | ARG_C,		\
-  ARG_A | ARG_B | ARG_C,		\
-  ARG_A | ARG_B | ARG_C,		\
-  ARG_A | ARG_B | ARG_C,		\
-  ARG_A | ARG_B | ARG_C,		\
-  /* unm */ ARG_A | ARG_B, 		\
-  ARG_A | ARG_B,			\
-  ARG_A | ARG_B,			\
-  ARG_A | ARG_B,			\
-  ARG_A | ARG_B,			\
-  ARG_A | ARG_B,			\
-  /* ge */ ARG_A | ARG_B,		\
-  ARG_sBx,				\
-  ARG_A | ARG_B | ARG_C,		\
-  ARG_A | ARG_Bx,			\
-  ARG_A
+  ARG_NONE,		/* nop */	  \
+  ARG_A | ARG_B,	/* move */	  \
+  ARG_A | ARG_Bx,	/* loadk */	  \
+  ARG_A | ARG_B,	/* loadbool */	  \
+  ARG_A,		/* loadnull */	  \
+  ARG_A | ARG_Bx, 	/* getglobal */	  \
+  ARG_A | ARG_Bx,	/* setglobal */	  \
+  ARG_A | ARG_Bx,	/* getlocal */	  \
+  ARG_A | ARG_Bx,	/* setlocal */	  \
+  ARG_A | ARG_Bx, 	/* getarg */	  \
+  ARG_A | ARG_B,	/* getexternal*/  \
+  ARG_A | ARG_B | ARG_C,/* add */	  \
+  ARG_A | ARG_B | ARG_C,/* sub */	  \
+  ARG_A | ARG_B | ARG_C,/* mul */	  \
+  ARG_A | ARG_B | ARG_C,/* div */	  \
+  ARG_A | ARG_B | ARG_C,/* pow */	  \
+  ARG_A | ARG_B | ARG_C,/* rem */	  \
+  ARG_A | ARG_B, 	/* unm */	  \
+  ARG_A | ARG_B,	/* not */	  \
+  ARG_A | ARG_B,	/* eq */	  \
+  ARG_A | ARG_B,	/* lt */	  \
+  ARG_A | ARG_B,	/* gt */	  \
+  ARG_A | ARG_B,	/* le */	  \
+  ARG_A | ARG_B,    	/* ge */  	  \
+  ARG_sBx,		/* jmp */	  \
+  ARG_A | ARG_B | ARG_C,/* call */	  \
+  ARG_A | ARG_Bx,	/* closure */	  \
+  ARG_A                 /* return */
 
 #define OPCODE_LABELS "nop",			\
     "move",					\
@@ -206,6 +214,7 @@ typedef enum {
     "getlocal",					\
     "setlocal",					\
     "getarg",	 				\
+    "getexternal", 				\
     "add",					\
     "sub",					\
     "mul",					\

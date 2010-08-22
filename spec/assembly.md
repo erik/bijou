@@ -19,6 +19,7 @@ Comments are indicated by a ';' and run until the end of the line
    2.  `.globals [number]` Number of globals (only in top level function)
    3.  `.upvals  [number]` Number of upvals for function
    4.  `.params  [number]` Number of parameters for function
+   5.  `.name    [name]`   Name of function (not a string -- `.name my_func`)
 
 
 ##Code:

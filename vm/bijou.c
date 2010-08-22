@@ -15,6 +15,7 @@ int usage(void)
 {
     fprintf(stderr, "Usage:\nbijou [options] file\n"
             "-d\tDump bytecode in human readable format\n"
+            "-l\tLink to a dynamically loaded library\n"
             "-v\tDisplay version and exit\n"
             "-h\tDisplay this help text\n");
     return 1;
@@ -36,6 +37,8 @@ int main(int argc, char ** argv)
     char* inputfile = "";
     int dump = 0;
 
+    BijouVM* vm = BijouVM_new(0);
+
     int i;
 
     if (argc <= 1) {
@@ -50,6 +53,26 @@ int main(int argc, char ** argv)
             case 'd':
                 dump = 1;
                 break;
+            case 'l': {
+
+                if (i >= argc - 1) {
+                    fprintf(stderr, "Expected lib name\n");
+                    return usage();
+                }
+
+                arg = argv[++i];
+
+                void *handle = LIB_LOAD(arg);
+                if (! handle) {
+                    fprintf(stderr, "Error on dynamic load: %s\n", LIB_ERROR);
+                    exit(1);
+                }
+                BijouVM_push_lib(vm, handle);
+
+
+                break;
+
+            }
             case 'v': {
                 int maj = (BIJOU_VERSION & 0xF0) >> 4;
                 int min = BIJOU_VERSION & 0x0F;
@@ -83,7 +106,6 @@ int main(int argc, char ** argv)
         exit(1);
     }
 
-    BijouVM* vm = BijouVM_new(0);
     BijouBlock* b = BijouBlock_new(0);
     BijouFrame* frame = B_ALLOC(BijouFrame);
 

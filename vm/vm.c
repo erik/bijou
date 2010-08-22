@@ -9,6 +9,7 @@
 #include "lib.h"
 #include "func.h"
 
+#include <string.h>
 
 BijouVM *BijouVM_new(size_t numglobals)
 {
@@ -16,6 +17,7 @@ BijouVM *BijouVM_new(size_t numglobals)
     v->globals = B_MALLOC(sizeof(TValue) * numglobals);
     v->numglobals = numglobals;
     kv_init(v->functions);
+    kv_init(v->libs);
 
     setup_internal_functions(v);
 
@@ -46,6 +48,9 @@ void BijouVM_destroy(VM)
     size_t i;
     for (i = 0; i < kv_size(vm->functions); ++i) {
         BijouFunction_destroy(kv_A(vm->functions, i));
+    }
+    for (i = 0; i < kv_size(vm->libs); ++i) {
+        LIB_CLOSE(kv_A(vm->libs, i));
     }
     B_FREE(vm->globals);
     B_FREE(vm);
@@ -79,6 +84,15 @@ int BijouVM_push_function(VM, BijouFunction* func)
     return size;
 
 }
+
+int BijouVM_push_lib(VM, void* handle)
+{
+    int size = kv_size(vm->libs);
+    kv_push(void *, vm->libs, handle);
+    return size;
+}
+
+
 /* dispatch macros */
 #define NEXT_INST           { (i = *++pc); }
 #define OP(n)               case OP_##n
@@ -104,8 +118,6 @@ int BijouVM_push_function(VM, BijouFunction* func)
 
 TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
 {
-    UNUSED(argc);
-    UNUSED(argv);
 
     f->stack             = B_MALLOC(sizeof(TValue) * b->regc);
     bInst *pc            = b->code.a + start;
@@ -117,9 +129,8 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
 
     size_t x = 0;
 
-    for (x = 0; pc <= b->code.a + start + kv_size(b->code); x++) {
-        /* TODO: GETGLOBAL */
-        /* TODO: SETGLOBAL */
+    for (x = 0; pc <= b->code.a + start + kv_size(b->code); ++x) {
+
         switch (OPCODE) {
         case OP_NOP:
             DISPATCH;
@@ -272,6 +283,68 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             R[A] = argv[Bx];
             DISPATCH;
         }
+
+        case OP_GETEXTERNAL: {
+
+            if (kv_size(vm->libs) == 0) {
+                fprintf(stderr, "Tried to call external function, but no libs are linked!\n");
+                exit(1);
+            }
+            TValue tval = K[B];
+
+            if (tval.tt != BIJOU_TSTRING) {
+                fprintf(stderr, "Expected a string for getexternal, but got %s\n", TValue_type_to_string(tval));
+                exit(1);
+            }
+
+            char* func = B_MALLOC(5 + strlen(tval.value.s.ptr));
+            strcpy(func, "func_");
+            strcpy(func + 5, tval.value.s.ptr);
+
+            char *func_args = B_MALLOC(5 + strlen(tval.value.s.ptr));
+            strcpy(func_args, "args_");
+            strcpy(func_args + 5, tval.value.s.ptr);
+
+
+            TValue (*fptr)(BijouVM*, BijouBlock*, int, TValue*);
+            int *num_args;
+
+            void *handle;
+
+            int found = 0;
+            size_t ctr;
+
+            char* error;
+            for (ctr = 0; ctr < kv_size(vm->libs); ++ctr) {
+                handle = kv_A(vm->libs, ctr);
+
+                if (handle == NULL) {
+                    fprintf(stderr, "Error occured on dynamic load: %s\n", LIB_ERROR);
+                    exit(1);
+                }
+
+                *(void **)(&fptr) = LIB_READ(handle, func);
+                num_args = (int *)LIB_READ(handle, func_args);
+
+                error = LIB_ERROR;
+
+                if (fptr != NULL) {
+                    found = 1;
+                    break;
+                }
+            }
+
+            if (!found || fptr == NULL || num_args == NULL) {
+                fprintf(stderr, "Error on dynamic load: %s\n", error);
+                exit(1);
+            }
+
+            BijouFunction* f = BijouFunction_new((BijouFunc*)fptr, *num_args, func, 2, NULL);
+            R[A] = create_function(f);
+            DISPATCH;
+
+        }
+
 
 
         /* condense this math section */
