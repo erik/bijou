@@ -496,7 +496,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                     exit(1);
                 }
                 int index = (int)Bx;
-		
+
                 BijouBlock* block = b->children[index];
                 BijouFunction* func = BijouFunction_new(NULL, block->argc, block->funcname, 0, block);
                 R[A] = create_function(func);

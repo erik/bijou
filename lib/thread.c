@@ -27,7 +27,8 @@ typedef struct call_struct {
 
 
 /* handle for all threads to use */
-static void* thread_call(void *call_str) {
+static void* thread_call(void *call_str)
+{
     call_struct* cs = (call_struct *)call_str;
 
     BijouFunction_call(cs->vm, cs->b, *cs->func, cs->args, cs->argc);
@@ -42,7 +43,8 @@ static void* thread_call(void *call_str) {
  *	thread   [pthread_t]
  */
 int    args_thread_create = 1;
-TValue func_thread_create(VM, BijouBlock* blk, int argc, TValue* argv) {
+TValue func_thread_create(VM, BijouBlock* blk, int argc, TValue* argv)
+{
     UNUSED(vm);
     UNUSED(blk);
     UNUSED(argc);
@@ -50,7 +52,7 @@ TValue func_thread_create(VM, BijouBlock* blk, int argc, TValue* argv) {
     pthread_t* thread;
     int return_val;
     call_struct* cs;
-    
+
     SHOULD_BE(argv[0], BIJOU_TFUNCTION);
 
     thread = B_ALLOC(pthread_t);
@@ -64,9 +66,9 @@ TValue func_thread_create(VM, BijouBlock* blk, int argc, TValue* argv) {
 
     return_val = pthread_create(thread, NULL, thread_call, (void *)cs);
 
-    if(return_val) {
-	fprintf(stderr, "Error: thread_create returned with error code: %d\n", return_val);
-	exit(1);
+    if (return_val) {
+        fprintf(stderr, "Error: thread_create returned with error code: %d\n", return_val);
+        exit(1);
     }
 
     return create_pointer(thread);
@@ -79,7 +81,8 @@ TValue func_thread_create(VM, BijouBlock* blk, int argc, TValue* argv) {
  *	[null]
  */
 int    args_sleep = 1;
-TValue func_sleep(VM, BijouBlock* blk, int argc, TValue* argv) {
+TValue func_sleep(VM, BijouBlock* blk, int argc, TValue* argv)
+{
     UNUSED(vm);
     UNUSED(blk);
     UNUSED(argc);
@@ -92,15 +95,15 @@ TValue func_sleep(VM, BijouBlock* blk, int argc, TValue* argv) {
     seconds = (long)argv[0].value.n;
     t.tv_sec  = (time_t)seconds;
     t.tv_nsec = seconds*1000;
-    
+
     int ret = nanosleep(&t, NULL);
-    if(ret == -1) {
-	fprintf(stderr, "Sleep error: %s\n", strerror(errno));
-	exit(1);
-    }   
+    if (ret == -1) {
+        fprintf(stderr, "Sleep error: %s\n", strerror(errno));
+        exit(1);
+    }
 
     return create_null();
-    
+
 }
 
 /*
@@ -110,7 +113,8 @@ TValue func_sleep(VM, BijouBlock* blk, int argc, TValue* argv) {
  *	[null]
  */
 int    args_thread_yield = 0;
-TValue func_thread_yield(VM, BijouBlock* blk, int argc, TValue* argv) {
+TValue func_thread_yield(VM, BijouBlock* blk, int argc, TValue* argv)
+{
     UNUSED(vm);
     UNUSED(blk);
     UNUSED(argc);
@@ -118,12 +122,12 @@ TValue func_thread_yield(VM, BijouBlock* blk, int argc, TValue* argv) {
 
     int status = sched_yield();
 
-    if(status != 0) {
-	fprintf(stderr, "Error on thread_yield: %s\n", strerror(status));
-	exit(1);
+    if (status != 0) {
+        fprintf(stderr, "Error on thread_yield: %s\n", strerror(status));
+        exit(1);
     }
 
     return create_null();
 }
-    
-    
+
+
