@@ -211,6 +211,7 @@ TValue func_send(VM, BijouBlock* blk, int argc, TValue* argv)
     msg  = argv[1].value.s.ptr;
     size = argv[1].value.s.len;
 
+
     int bytes_sent = send(sock, msg, size, 0);
     if (bytes_sent == -1) {
         fprintf(stderr, "Send failed: %s\n", strerror(errno));
@@ -253,5 +254,7 @@ TValue func_recv(VM, BijouBlock* blk, int argc, TValue* argv)
         exit(1);
     }
 
-    return create_TValue_string(BijouString_new(buf));
+    TValue ret = create_TValue_string(BijouString_new(buf));
+    B_FREE(buf);
+    return ret;
 }

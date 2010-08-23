@@ -44,14 +44,24 @@
     getglobal 2 12  ; addrinfo
     call 3 0 2      ; connect(socket, info)
 
+    closure 0 0     ; sendmessage
+    loadk   1 17    ; nick
+    call 2 0 1      ; sendmessage(user)
+    loadk   1 18    ; user
+    call 2 0 1      ; sendmessage(nick)
+    loadk   1 19    ; chan
+    call 2 0 1      ; sendmessage(chan)
+
+    ; main loop. recv from server
     getglobal 0 11  ; recv
     getglobal 1 13  ; socket fd
     loadk     2 16  ; max read
     call 3 0 2      ; recv(socket, max)
-    closure 4 1K    ; println
+    closure 4 0K    ; println
     move 5 3        ;
     call 6 4 1      ; println
 
+    jmp -7          ;
     return 6 ;
 
 <CODE
@@ -77,6 +87,32 @@
     1#6     ; 13
     1#7     ; 14
     1#8     ; 15
-    1#10000 ; 16
-    
+    1#100 ; 16
+
+    3#"USER blah blah blah :blah blah\r\n"; user - 17
+    3#"NICK bijoubot\r\n "; nick - 18    
+    3#"JOIN #()\r\n"; channel - 19
+
+    4#
+    >HEAD
+    ; send a message
+    ; params
+    ;  message - string
+    .regs 20      ; number of registers needed
+    .name sendmsg ;
+    .upvals 0     ; number of upvals
+    .params 1     ; number of parameters
+    <HEAD
+    >CODE
+        getglobal 0 0 ; send
+        getglobal 1 1 ; socket fd
+        getarg    2 0  ; message
+        call    3 0 2  ; send(socket fd, message) 
+    <CODE
+    >CONST
+        1#3   ; 0
+        1#6   ; 1
+    <CONST
+
+
 <CONST

@@ -94,7 +94,7 @@ static void DumpString(BijouString *s, DumpState *D)
 
             strcpy(str + i, pch + 1);
 
-            pch = strchr(pch +  2, '\\');
+            pch = strchr(pch +  1, '\\');
 
         }
         DumpVar(size, D);
