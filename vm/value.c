@@ -83,6 +83,17 @@ TValue create_TValue_string(BijouString s)
 
 }
 
+/* create a TValue containing a pointer to something */
+TValue create_pointer(void * p)
+{
+    TValue tv;
+    Value v;
+    v.pointer = p;
+    tv.tt = BIJOU_TPOINTER;
+    tv.value = v;
+
+    return tv;
+}
 /* returns nonzero if the two parameters are equal,
  * zero otherwise.
  */

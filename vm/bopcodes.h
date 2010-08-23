@@ -114,7 +114,7 @@ typedef enum {
     OP_GETLOCAL,    /* A Bx     R[A] = locals[K[Bx]] */
     OP_SETLOCAL,    /* A Bx     locals[K[Bx]] = R[A]*/
     OP_GETARG,      /* A Bx     R[A] = argv[Bx] */
-    OP_GETEXTERNAL, /* A B      R[A] = function K[B] included libs (see explanation below) */
+    OP_GETEXTERNAL, /* A Bx     R[A] = function K[B] included libs (see explanation below) */
 
     /* Math ops */
     OP_ADD,         /* A B C    R[A] = RK[B] + RK[C] */

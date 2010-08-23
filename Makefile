@@ -51,10 +51,10 @@ all: $(VM) $(COMPILER) bijoulib
 # count source lines of code
 # requires sloccount
 sloc: 
-	@sloccount vm | grep '(SLOC)'
+	@sloccount vm lib | grep '(SLOC)'
 
 loc: 
-	@cd vm && wc -l *.[ch] vendor/* | grep total
+	@wc -l vm/*.[ch] vm/vendor/* lib/*.[ch] | grep total
 
 size: 
 	@rm -f vm/*~ && du -sh vm
@@ -62,7 +62,7 @@ size:
 # reformat code (requires astyle)
 pretty:
 	@echo " formatting"
-	@astyle -A4 -n vm/*.[ch] | grep formatted \
+	@astyle -A4 -n vm/*.[ch] lib/*.[ch] | grep formatted \
 		|| echo "   no changes"
 
 # runs valgrind

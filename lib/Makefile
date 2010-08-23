@@ -1,8 +1,9 @@
 CC= gcc
-CFLAGS= -Wall -Wextra -std=c99 $(OPTIMIZE) -g -fPIC
+# the -D_POSIX_C_SOURCE=200112L bit is for compiling net. (don't ask)
+CFLAGS= -Wall -Wextra -std=c99 $(OPTIMIZE) -g -fPIC -D_POSIX_C_SOURCE=200112L
 INCS= -I../vm
 LDFLAGS = -lm -ldl -shared
-SOURCES= test.c
+SOURCES= test.c net.c
 OBJECTS= $(SOURCES:.c=.o)
 
 #shared object extension
@@ -35,10 +36,14 @@ clean:
 rebuild: clean all
 
 test.o: test.c
+net.o:  net.c
 
 test.$(SOEXT): test.o
 	@echo "  link test"
 	@$(CC) $(LDFLAGS)  $< $(VMOBJECTS) -o $@
+net.$(SOEXT): net.o
+	@echo "  link net"
+	@$(CC) $(LDFLAGS) $< $(VMOBJECTS) -o $@
 
 .c.o:
 	@echo "  cc $<"

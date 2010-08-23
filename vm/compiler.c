@@ -240,10 +240,7 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             setboolvalue(&t, atoi(line + 2));
             break;
         case BIJOU_TSTRING: {
-            strncpy(line, line + 3, strlen(line) - 2);
-            line[strlen(line) - 1] = '\0';
-
-            BijouString str = BijouString_new(line);
+            BijouString str = BijouString_new(line + 3);
             t = create_TValue_string(str);
 
             break;
@@ -255,7 +252,10 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             BijouBlock_push_child(b, func);
             break;
         }
-
+        case BIJOU_TPOINTER: {
+            fprintf(stderr, "Error: trying to save a pointer object\n");
+            exit(1);
+        }
         default:
             fprintf(stderr, "Unknown type: %d (%s)\n", type, line);
             exit(1);
@@ -320,7 +320,7 @@ char* read_next(FILE* file)
                 string[i] = c;
             }
 
-            string = B_REALLOC(string, ++i + 1);
+            string = B_REALLOC(string, i + 1);
             string[i + 1] = '"';
         }
 
@@ -333,6 +333,7 @@ char* read_next(FILE* file)
 char *read_line(FILE* file)
 {
     char* string = B_MALLOC(1 * sizeof(char));
+    memset(string, '\0', 1);
 
     size_t i;
     char c;
@@ -345,6 +346,7 @@ char *read_line(FILE* file)
     for (i = 1; (c = fgetc(file)) != '\n'; ++i) {
 
         if ( c == ';') {
+            string[i - 1] = '\0';
             while (fgetc(file) != '\n') {} ;
             return string;
         }
@@ -368,13 +370,12 @@ char *read_line(FILE* file)
                 string[i] = c;
             }
 
-            string = B_REALLOC(string, i++ + 2);
+            string = B_REALLOC(string, i++);
             string[i] = '"';
         }
     }
 
     string[i] = '\0';
-
     return string;
 
 }

@@ -26,7 +26,7 @@
 
 #if defined __linux || __APPLE__ & __MACH__
 #include <dlfcn.h>
-#define LIB_LOAD(file)    dlopen(file, RTLD_LAZY)
+#define LIB_LOAD(file)    dlopen(file, RTLD_NOW | RTLD_GLOBAL)
 #define LIB_READ(h, func) dlsym(h, func)
 #define LIB_CLOSE(func)   dlclose(func)
 #define LIB_ERROR         dlerror()

@@ -51,6 +51,7 @@ typedef unsigned int bInst;
 #define BIJOU_TBOOLEAN     (2)
 #define BIJOU_TSTRING      (3)
 #define BIJOU_TFUNCTION    (4)
+#define BIJOU_TPOINTER     (5)
 
 /* type of numbers is always float (for now) */
 typedef BIJOU_DOUBLE bijou_Number;
@@ -62,10 +63,11 @@ typedef struct BijouString {
 
 
 typedef union {
-    BijouString s;  /* string */
-    bijou_Number n; /* number */
+    BijouString s;  		/* string */
+    bijou_Number n; 		/* number */
+    void* pointer;     		/* pointer to a C struct or whatnot */
     struct BijouFunction* func; /* function */
-    int b;          /* boolean */
+    int b;          		/* boolean */
 } Value;
 
 /* tagged value */
@@ -98,6 +100,7 @@ typedef struct BijouFunction {
 #define ttisboolean(o)  (ttype(o) == BIJOU_TBOOLEAN)
 #define ttisstring(o)   (ttype(o) == BIJOU_TSTRING)
 #define ttisfunction(o) (ttype(o) == BIJOU_TFUNCTION)
+#define ttispointer(o) (ttype(o) == BIJOU_TPOINTER)
 
 #define isfalse(o)      (ttisnull(o) || (ttisboolean(o) && bvalue(o) == 0))
 
@@ -180,6 +183,7 @@ TValue create_boolean(bijou_Number);
 TValue create_null(void);
 TValue create_none(void);
 TValue create_function(BijouFunction*);
+TValue create_pointer(void *);
 TValue create_TValue_string(BijouString);
 const TValue *to_number(const TValue *, TValue *);
 int TValue_equal(TValue, TValue);

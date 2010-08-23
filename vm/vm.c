@@ -298,12 +298,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             }
 
             char* func = B_MALLOC(5 + strlen(tval.value.s.ptr));
-            strcpy(func, "func_");
-            strcpy(func + 5, tval.value.s.ptr);
-
-            char *func_args = B_MALLOC(5 + strlen(tval.value.s.ptr));
-            strcpy(func_args, "args_");
-            strcpy(func_args + 5, tval.value.s.ptr);
+            char *func_args = B_MALLOC( 5 + strlen(tval.value.s.ptr));
 
 
             TValue (*fptr)(BijouVM*, BijouBlock*, int, TValue*);
@@ -316,6 +311,9 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
 
             char* error;
             for (ctr = 0; ctr < kv_size(vm->libs); ++ctr) {
+                B_FREE(func);
+                B_FREE(func_args);
+
                 handle = kv_A(vm->libs, ctr);
 
                 if (handle == NULL) {
@@ -323,23 +321,39 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                     exit(1);
                 }
 
-                *(void **)(&fptr) = LIB_READ(handle, func);
-                num_args = (int *)LIB_READ(handle, func_args);
+                /* FIXME: Obviously, I'm doing it wrong here. */
+
+                func = B_MALLOC(5 + strlen(tval.value.s.ptr));
+                memset(func, '\0', 5 + strlen(tval.value.s.ptr));
+                strcpy(func, "func_");
+                strcpy(func + 5, tval.value.s.ptr);
+                func[strlen(func)] = '\0';
+
+                func_args = B_MALLOC( 5 + strlen(tval.value.s.ptr));
+                memset(func_args, '\0', 5 +  strlen(tval.value.s.ptr));
+                strcpy(func_args, "args_");
+                strcpy(func_args + 5, tval.value.s.ptr);
+                func_args[strlen(func_args)] = '\0';
+
+                num_args = LIB_READ(handle, func_args);
+
+                fptr = (BijouFunc *)LIB_READ(handle, func);
+
 
                 error = LIB_ERROR;
 
-                if (fptr != NULL) {
+                if (fptr != NULL && num_args != NULL) {
                     found = 1;
                     break;
                 }
             }
 
-            if (!found || fptr == NULL || num_args == NULL) {
+            if (!found || error != NULL) {
                 fprintf(stderr, "Error on dynamic load: %s\n", error);
                 exit(1);
             }
 
-            BijouFunction* f = BijouFunction_new((BijouFunc*)fptr, *num_args, func, 2, NULL);
+            BijouFunction* f = BijouFunction_new((BijouFunc*)fptr, *num_args, tval.value.s.ptr, 2, NULL);
             R[A] = create_function(f);
             DISPATCH;
 
@@ -463,6 +477,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             BijouFunction *func = R[B].value.func;
 
             R[A] = BijouFunction_call(vm, b, *func, (R + 1) + B, C);
+
             DISPATCH;
         }
 
