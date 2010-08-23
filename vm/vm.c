@@ -495,9 +495,10 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                     fprintf(stderr, "Tried to access function %d (%d exist)\n", Bx, b->numchildren);
                     exit(1);
                 }
-                int index = (int)numvalue(R[Bx]);
+                int index = (int)Bx;
+		
                 BijouBlock* block = b->children[index];
-                BijouFunction* func = BijouFunction_new(NULL, block->argc, "<function>", 0, block);
+                BijouFunction* func = BijouFunction_new(NULL, block->argc, block->funcname, 0, block);
                 R[A] = create_function(func);
             }
             DISPATCH;

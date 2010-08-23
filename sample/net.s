@@ -52,6 +52,10 @@
     loadk   1 19    ; chan
     call 2 0 1      ; sendmessage(chan)
 
+    getexternal 0 20 ; thread create
+    closure 1 1      ; ping
+    call 6 0 1       ; thread_create(ping)
+
     ; main loop. recv from server
     getglobal 0 11  ; recv
     getglobal 1 13  ; socket fd
@@ -93,6 +97,8 @@
     3#"NICK bijoubot\r\n "; nick - 18    
     3#"JOIN #()\r\n"; channel - 19
 
+    3#"thread_create"; 20
+    
     4#
     >HEAD
     ; send a message
@@ -114,5 +120,35 @@
         1#6   ; 1
     <CONST
 
+    4#
+    >HEAD
+    ; ping a channel
+    ; params
+    ;  NONE (thread)
+    .regs 20      ; number of registers needed
+    .name ping    ;
+    .upvals 0     ; number of upvals
+    .params 0     ;
+    <HEAD
+    >CODE
+        getexternal 0 3 ; sleep
+        loadk 1 5     ;
+        call 2 0 1    ; sleep(100)
+        getexternal 0 4 ; thread_yield
+        call 2 0 0    ; thread_yield()
+        getglobal 0 0 ; send
+        getglobal 1 1 ; socket fd
+        loadk     2 2 ; "PING..."
+        call 3 0 2    ; send(socket fd, "PING..")
+        jmp -10 ;
+    <CODE
+    >CONST
+        1#3   ; 0
+        1#6   ; 1
+        3#"PING #()\r\n"; 2
+        3#"sleep"; 3
+        3#"thread_yield"; 4
+        1#100      ; 5
+    <CONST
 
 <CONST
