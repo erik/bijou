@@ -106,7 +106,7 @@ TValue func_bind(VM, BijouBlock* blk, int argc, TValue* argv)
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
     SHOULD_BE(argv[1], BIJOU_TPOINTER);
 
-    sock = (int)numvalue(&argv[0]);
+    sock = (int)argv[0].value.n;
     info = (struct addrinfo *)argv[0].value.pointer;
 
     int status = bind(sock, info->ai_addr, info->ai_addrlen);
@@ -140,8 +140,8 @@ TValue func_connect(VM, BijouBlock* blk, int argc, TValue* argv)
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
     SHOULD_BE(argv[1], BIJOU_TPOINTER);
 
-    sock = (int)numvalue(&argv[0]);
-    info = (struct addrinfo *)argv[0].value.pointer;
+    sock = (int)argv[0].value.n;
+    info = (struct addrinfo *)argv[1].value.pointer;
 
     int status = connect(sock, info->ai_addr, info->ai_addrlen);
     if (status == -1) {
@@ -172,7 +172,7 @@ TValue func_listen(VM, BijouBlock* blk, int argc, TValue* argv)
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
     SHOULD_BE(argv[1], BIJOU_TNUMBER);
 
-    sock = (int)numvalue(&argv[0]);
+    sock = (int)argv[0].value.n;
     backlog = (int)numvalue(&argv[1]);
 
     int status = listen(sock, backlog);
@@ -207,7 +207,7 @@ TValue func_send(VM, BijouBlock* blk, int argc, TValue* argv)
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
     SHOULD_BE(argv[1], BIJOU_TSTRING);
 
-    sock = (int)numvalue(&argv[0]);
+    sock = (int)argv[0].value.n;
     msg  = argv[1].value.s.ptr;
     size = argv[1].value.s.len;
 
@@ -242,8 +242,8 @@ TValue func_recv(VM, BijouBlock* blk, int argc, TValue* argv)
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
     SHOULD_BE(argv[1], BIJOU_TNUMBER);
 
-    sock = (int)numvalue(&argv[0]);
-    len  = (int)numvalue(&argv[1]);
+    sock = (int)argv[0].value.n;
+    len  = (int)argv[1].value.n;
 
     buf = B_MALLOC(len);
 
