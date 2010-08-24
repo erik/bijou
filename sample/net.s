@@ -73,11 +73,11 @@
 ; const secton
 >CONST
 
-    3#"getaddrinfo"; 0
-    3#"socket"; 1
-    3#"connect"; 2
-    3#"send"; 3
-    3#"recv"; 4
+    3#"getaddrinfo" ; 0
+    3#"socket"      ; 1
+    3#"connect"     ; 2
+    3#"send"        ; 3
+    3#"recv"        ; 4
 
     3#"irc.freenode.net"; 5
     3#"6667"; 6
@@ -93,11 +93,11 @@
     1#8     ; 15
     1#100 ; 16
 
-    3#"USER blah blah blah :blah blah\r\n"; user - 17
-    3#"NICK bijoubot\r\n "; nick - 18    
-    3#"JOIN #()\r\n"; channel - 19
+    3#"USER blah blah blah :blah blah\r\n" ; user - 17
+    3#"NICK bijoubot\r\n "                 ; nick - 18    
+    3#"JOIN #()\r\n"                       ; channel - 19
 
-    3#"thread_create"; 20
+    3#"thread_create"                      ; 20
     
     4#
     >HEAD
@@ -145,10 +145,10 @@
     >CONST
         1#3   ; 0
         1#6   ; 1
-        3#"PING #()\r\n"; 2
-        3#"sleep"; 3
-        3#"thread_yield"; 4
-        1#100      ; 5
+        3#"PING #()\r\n" ; 2
+        3#"sleep"        ; 3
+        3#"thread_yield" ; 4
+        1#100            ; 5
     <CONST
 
 <CONST

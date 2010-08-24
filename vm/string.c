@@ -9,16 +9,11 @@
 /* create a new BijouString from the given char* */
 BijouString BijouString_new(char * str)
 {
-    BijouString* bs = B_ALLOC(BijouString);
-    if (str == NULL) {
-        bs->ptr = NULL;
-    } else {
-        bs->ptr = B_MALLOC(strlen(str));
+    BijouString bs;
 
-        bs->ptr = strcpy(bs->ptr, str);
-    }
-    bs->len = str == NULL ? 0 : strlen(str);
-    return *bs;
+    bs.ptr = str;
+    bs.len = str == NULL ? 0 : strlen(str);
+    return bs;
 }
 
 /* create a new BijouString from the given char* */
