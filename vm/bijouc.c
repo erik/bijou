@@ -76,8 +76,10 @@ int main(int argc, char **argv)
         return usage();
     }
 
-    FILE* in = fopen(inputfile, "rb");
+    FILE* in = NULL;
     FILE* out = NULL;
+
+    in = fopen(inputfile, "rb");
 
     if (! (options & OPT_PARSE))
         out = fopen(outputfile, "wb");

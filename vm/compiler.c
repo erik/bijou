@@ -263,7 +263,6 @@ void compile_const(FILE* file, VM, BijouBlock* b)
 
         BijouBlock_push_const(b, t);
 
-
         line = read_line(file);
     }
     B_FREE(line);

@@ -235,12 +235,13 @@ Proto* to_proto(VM, BijouBlock *b)
 
 void Proto_destroy(Proto *p)
 {
-    B_FREE(p->k);
-    B_FREE(p->code);
+
     size_t i;
     for (i = 0; i < p->sizep; ++i) {
         B_FREE(p->p[i]);
     }
+    B_FREE(p->p);
+    B_FREE(p->code);
     B_FREE(p);
 }
 
