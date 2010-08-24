@@ -240,7 +240,26 @@ void compile_const(FILE* file, VM, BijouBlock* b)
             setboolvalue(&t, atoi(line + 2));
             break;
         case BIJOU_TSTRING: {
-            BijouString str = BijouString_new(line + 3);
+            size_t i;
+            size_t x = 0;
+
+            /* skip past "3#"" */
+            line = line + 3;
+            char *s = B_MALLOC(strlen(line));
+            memset(s, '\0', strlen(line));
+            for ( i = 0; i < strlen(line); ++i) {
+                char c = line[i];
+                if (c == '"') {
+                    s[x] = '\0';
+                    break;
+                } else {
+                    s[x++] = c;
+                    s[x] = '\0';
+                }
+            }
+            s = B_REALLOC(s, x);
+            BijouString str = BijouString_new(s);
+            B_FREE(s);
             t = create_TValue_string(str);
 
             break;

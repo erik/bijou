@@ -28,5 +28,5 @@
     1#0
     1#42
     1#5
-    3#"A string!"
+    3#"A string!"  ;
 <CONST
