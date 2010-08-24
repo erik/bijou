@@ -21,6 +21,6 @@
 ; const secton
 >CONST
 
-    3#"test"
+    3#"test"; 0
 
 <CONST

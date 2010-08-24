@@ -57,7 +57,11 @@ loc:
 	@wc -l vm/*.[ch] vm/vendor/* lib/*.[ch] | grep total
 
 size: 
-	@rm -f vm/*~ && du -sh vm
+	@rm -f vm/*~ lib/*~ && du -sh vm lib
+
+todo:
+	@find vm lib -type f | xargs grep -n -i "TODO"
+	@find vm lib -type f | xargs grep -n -i "FIXME"
 
 # reformat code (requires astyle)
 pretty:
@@ -119,6 +123,12 @@ clean:
 	@rm -f vm/*~
 	@rm -f $(VM)
 	@rm -f $(COMPILER)
+
+distclean: clean
+	@cd lib && make clean
+
+completeclean: clean distclean
+	@cd vendor/gc && make clean
 
 rebuild: clean $(VM) $(COMPILER) bijoulib
 
