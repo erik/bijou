@@ -370,8 +370,8 @@ char *read_line(FILE* file)
                 string[i] = c;
             }
 
-            string = B_REALLOC(string, i++);
-            string[i] = '"';
+            string = B_REALLOC(string, ++i + 1);
+            string[i] = '\0';
         }
     }
 

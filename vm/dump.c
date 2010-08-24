@@ -194,7 +194,7 @@ Proto* to_proto(VM, BijouBlock *b)
     UNUSED(vm);
 
     Proto *p = B_ALLOC(Proto);
-    
+
     p->source = BijouString_new(b->filename);
     p->name = BijouString_new(b->funcname);
 
