@@ -1,4 +1,6 @@
-    ;; network test (link with net lib)
+    ;; network test
+        ;; connects to freenode
+        ;; requires thread and net libs
 
 ; function header
 >HEAD
@@ -92,7 +94,7 @@
     1#6     ; 13
     1#7     ; 14
     1#8     ; 15
-    1#100 ; 16
+    1#200 ; 16
 
     3#"USER blah blah blah :blah blah\r\n" ; user - 17
     3#"NICK bijoubot\r\n "                 ; nick - 18    

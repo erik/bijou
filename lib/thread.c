@@ -147,7 +147,7 @@ TValue func_thread_yield(VM, BijouBlock* blk, int argc, TValue* argv)
  * Args -
  *	thread [pthread_t]
  * Returns -
- *	rturn val [TValue
+ *	return val [TValue]
  */
 int    args_thread_join = 1;
 TValue func_thread_join(VM, BijouBlock* blk, int argc, TValue* argv)
