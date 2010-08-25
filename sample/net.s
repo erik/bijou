@@ -52,20 +52,21 @@
     loadk   1 19    ; chan
     call 2 0 1      ; sendmessage(chan)
 
+    getexternal 0 20 ; thread_create
+    closure 1 2      ; main loop
+    call 7 0 1       ; thread_create(loop)
+
     getexternal 0 20 ; thread create
     closure 1 1      ; ping
     call 6 0 1       ; thread_create(ping)
 
-    ; main loop. recv from server
-    getglobal 0 11  ; recv
-    getglobal 1 13  ; socket fd
-    loadk     2 16  ; max read
-    call 3 0 2      ; recv(socket, max)
-    closure 4 0K    ; println
-    move 5 3        ;
-    call 6 4 1      ; println
+    getexternal 0 21 ; thread_join
+    move 1 7         ; thread (loop)
+    call 8 0 1       ; thread_join
 
-    jmp -7          ;
+    move 1 6         ; thread (ping)
+    call 9 0 1       ; thread_join
+    
     return 6 ;
 
 <CODE
@@ -98,6 +99,7 @@
     3#"JOIN #()\r\n"                       ; channel - 19
 
     3#"thread_create"                      ; 20
+    3#"thread_join"                        ; 21
     
     4#
     >HEAD
@@ -134,13 +136,11 @@
         getexternal 0 3 ; sleep
         loadk 1 5     ;
         call 2 0 1    ; sleep(100)
-        getexternal 0 4 ; thread_yield
-        call 2 0 0    ; thread_yield()
         getglobal 0 0 ; send
         getglobal 1 1 ; socket fd
         loadk     2 2 ; "PING..."
         call 3 0 2    ; send(socket fd, "PING..")
-        jmp -10 ;
+        jmp -8 ;
     <CODE
     >CONST
         1#3   ; 0
@@ -150,5 +150,32 @@
         3#"thread_yield" ; 4
         1#100            ; 5
     <CONST
+
+    4#
+    >HEAD
+    ; recv
+    .regs 20      ; number of registers needed
+    .name main_loop ;
+    .upvals 0     ; number of upvals
+    .params 0     ; number of parameters
+    <HEAD
+    >CODE
+        ; main loop. recv from server
+        getexternal 0 0 ; recv
+        getglobal 1 1   ; socket fd
+        loadk     2 2  ; max read
+        call 3 0 2      ; recv(socket, max)
+        closure 4 0K    ; println
+        move 5 3        ;
+        call 6 4 1      ; println
+        jmp -7          ;
+        
+    <CODE
+    >CONST
+        3#"recv" ; 0
+        1#6      ; 1
+        1#100    ; 2
+    <CONST
+
 
 <CONST

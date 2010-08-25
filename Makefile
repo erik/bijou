@@ -13,7 +13,7 @@ CC=clang
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
 INCS= -Ivm 
 LIBS= ${GC}
-LDFLAGS= -lm -ldl
+LDFLAGS= -lm -ldl -lpthread
 
 ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/func.c \
 vm/compiler.c vm/lib.c vm/load.c vm/vm.c

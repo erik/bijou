@@ -11,6 +11,38 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct thread_call {
+    BijouVM* vm;
+    BijouFrame* frame;
+    BijouBlock* b;
+} thread_call;
+
+void *thread_handle(void* v)
+{
+    thread_call *args = (thread_call*)v;
+    TValue *t = B_ALLOC(TValue);
+    *t = bijou_interpret(args->vm, args->frame, args->b, 0, 0, NULL);
+    return (void*)t;
+}
+
+/* threaded versus unthreaded calling. If on Linux or Mac,
+ * threading is supported and should be used. On other OSes
+ * it isn't yet supported, so no thread is created
+ */
+#if defined __linux || __APPLE__ & __MACH__
+#include "pthread.h"
+#define INTERPRET     pthread_t thread; 			\
+    TValue* val; 						\
+    pthread_create(&thread, NULL, thread_handle, (void *)args); \
+    pthread_join(thread, (void**)&val);				\
+    char * str = TValue_to_string(*val)
+#else
+#define INTERPRET     TValue val;				\
+    val = bijou_interpret(vm, frame, b, 0, 0, NULL);  		\
+    char * str = TValue_to_string(val)
+#endif
+
+
 int usage(void)
 {
     fprintf(stderr, "Usage:\nbijou [options] file\n"
@@ -121,8 +153,12 @@ int main(int argc, char ** argv)
         BijouBlock_dump(vm, b);
     }
 
-    TValue val = bijou_interpret(vm, frame, b, 0, 0, NULL);
-    char * str = TValue_to_string(val);
+    thread_call *args = B_ALLOC(thread_call);
+    args->vm = vm;
+    args->frame = frame;
+    args->b = b;
+
+    INTERPRET;
 
     printf("Interpret returned: %s\n", str);
 

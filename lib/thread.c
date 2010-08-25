@@ -5,10 +5,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <time.h>
 #include <string.h>
 #include <errno.h>
+
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/time.h>
 
 #define SHOULD_BE(tval, type) if((tval).tt != (type)) { \
 	fprintf(stderr, "Expected type %d,"	        \
@@ -87,16 +90,26 @@ TValue func_sleep(VM, BijouBlock* blk, int argc, TValue* argv)
     UNUSED(blk);
     UNUSED(argc);
 
-    struct timespec t;
     long seconds;
 
     SHOULD_BE(argv[0], BIJOU_TNUMBER);
 
     seconds = (long)argv[0].value.n;
-    t.tv_sec  = (time_t)seconds;
-    t.tv_nsec = seconds*1000;
 
-    int ret = nanosleep(&t, NULL);
+    pthread_cond_t  cond  = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+    struct timespec ts;
+    struct timeval  tp;
+
+    gettimeofday(&tp, NULL);
+
+    ts.tv_sec  =  tp.tv_sec;
+    ts.tv_nsec =  tp.tv_usec * 1000;
+    ts.tv_sec  += seconds;
+
+    int ret = pthread_cond_timedwait(&cond, &mutex, &ts);
+
     if (ret == -1) {
         fprintf(stderr, "Sleep error: %s\n", strerror(errno));
         exit(1);
@@ -130,4 +143,26 @@ TValue func_thread_yield(VM, BijouBlock* blk, int argc, TValue* argv)
     return create_null();
 }
 
+/*
+ * Args -
+ *	thread [pthread_t]
+ * Returns -
+ *	rturn val [TValue
+ */
+int    args_thread_join = 1;
+TValue func_thread_join(VM, BijouBlock* blk, int argc, TValue* argv)
+{
+    UNUSED(vm);
+    UNUSED(blk);
+    UNUSED(argc);
 
+    pthread_t *thread;
+    TValue* val;
+    SHOULD_BE(argv[0], BIJOU_TPOINTER);
+
+    thread = (pthread_t *)argv[0].value.pointer;
+    pthread_join(*thread, (void**)&val);
+
+    return *val;
+
+}
