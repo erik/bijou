@@ -4,15 +4,17 @@ Bijou has the ability to load libraries written in C (or feasibly and natively
 compiled language) at runtime.
 
 Advantages:
-- Small core library
-- Easy to write
-- Simple way to extend Bijou's functionality
-- Functions are fast. 
+
+  - Small core library
+  - Easy to write
+  - Simple way to extend Bijou's functionality
+  - Functions are fast. 
 
 Disadvantages:
-- Non-portable across operating systems (the code itself should be portable however)
-- Increased load time
-- Some errors that would be caught at link time slip through to runtime
+
+  - Non-portable across operating systems (the code itself should be portable however)
+  - Increased load time
+  - Some errors that would be caught at link time slip through to runtime
 
 To create a library, all you need to do is mind your function naming and supply
 some different flags to your compiler (see lib/Makefile for Linux/Mac compilation).
