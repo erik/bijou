@@ -286,14 +286,16 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
 
         case OP_GETEXTERNAL: {
 
-            if (kv_size(vm->libs) == 0) {
-                fprintf(stderr, "Tried to call external function, but no libs are linked!\n");
-                exit(1);
-            }
             TValue tval = K[B];
 
             if (tval.tt != BIJOU_TSTRING) {
                 fprintf(stderr, "Expected a string for getexternal, but got %s\n", TValue_type_to_string(tval));
+                exit(1);
+            }
+
+            if (kv_size(vm->libs) == 0) {
+                fprintf(stderr, "Tried to call external function (%s), but no libs are linked!\n",
+                        tval.value.s.ptr);
                 exit(1);
             }
 

@@ -81,6 +81,8 @@ test: ${VM} ${COMPILER}
 	./bijou val.out
 	./bijouc sample/function.s -o val.out
 	./bijou val.out
+	./bijouc sample/string.s -o val.out
+	./bijou -l lib/string.so val.out
 	@rm -f val.out
 
 bijoulib: $(wildcard lib/*.so)
