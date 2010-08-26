@@ -39,6 +39,24 @@
 
     call 5 3 1      ; println 
 
+    getexternal 0 7 ; substr
+    loadk       1 1 ; "Hello, "
+    loadk       2 8 ; 1
+    loadk       3 9 ; 3
+
+    call      4 0 3 ; substr("Hello, ", 1, 3)
+    closure   3 1K  ; println
+
+    call      5 3 1 ; println
+
+    getexternal 0 10 ; length
+    loadk       1 2 ; "World"
+
+    call      4 0 1 ; length("World")
+    closure    3 1K ; println
+
+    call      5 3 1 ; println
+
     return 5      ;
 
 <CODE
@@ -54,6 +72,12 @@
     1#0            ; 4
 
     3#"index_of"   ; 5
-    3#"lll"         ; 6
+    3#"ll"         ; 6
+
+    3#"substr"     ; 7
+    1#1            ; 8
+    1#3            ; 9
+
+    3#"length"     ; 10
     
 <CONST

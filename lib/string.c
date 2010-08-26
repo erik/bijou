@@ -111,3 +111,51 @@ TValue func_index_of(VM, BijouBlock* blk, int argc, TValue* argv)
 
     return create_bijou_Number(index);
 }
+
+/*
+ * Args -
+ *	string [String]
+ *	begin  [Integer]
+ *	length [Integer]
+ * Returns -
+ *	string[begin]..string[begin + length]
+ */
+int    args_substr = 3;
+TValue func_substr(VM, BijouBlock* blk, int argc, TValue* argv)
+{
+    UNUSED(vm);
+    UNUSED(blk);
+    UNUSED(argc);
+
+    BijouString string;
+    int index;
+    int length;
+
+    SHOULD_BE(argv[0], BIJOU_TSTRING);
+    SHOULD_BE(argv[1], BIJOU_TNUMBER);
+    SHOULD_BE(argv[2], BIJOU_TNUMBER);
+
+    string =  argv[0].value.s;
+    index  =  argv[1].value.n;
+    length =  argv[2].value.n;
+
+    return create_TValue_string(BijouString_substr(string, index, length));
+}
+
+/*
+ * Args -
+ *	string [String]
+ * Returns -
+ *	length [Integer]
+ */
+int    args_length = 1;
+TValue func_length(VM, BijouBlock* blk, int argc, TValue* argv) {
+    UNUSED(vm);
+    UNUSED(blk);
+    UNUSED(argc);
+
+    SHOULD_BE(argv[0], BIJOU_TSTRING);
+
+    return create_bijou_Number(BijouString_len(argv[0].value.s));
+}
+ 
