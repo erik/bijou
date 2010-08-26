@@ -1,7 +1,7 @@
 CC= gcc
 # the -D_POSIX_C_SOURCE=200112L bit is for compiling net. (don't ask)
 CFLAGS= -Wall -Wextra -std=c99 $(OPTIMIZE) -g -fPIC -D_POSIX_C_SOURCE=200112L
-INCS= -I../vm
+INCS= -I../src
 LDFLAGS = -lm -ldl -shared
 SOURCES= test.c net.c thread.c string.c io.c
 OBJECTS= $(SOURCES:.c=.o)
@@ -11,8 +11,8 @@ SOEXT=so
 
 LIBS= $(OBJECTS:.o=.$(SOEXT))
 
-VMSOURCES= ../vm/block.c ../vm/value.c ../vm/string.c ../vm/number.c ../vm/dump.c \
-../vm/func.c ../vm/compiler.c ../vm/lib.c ../vm/load.c ../vm/vm.c
+VMSOURCES= ../src/block.c ../src/value.c ../src/string.c ../src/number.c ../src/dump.c \
+../src/func.c ../src/compiler.c ../src/lib.c ../src/load.c ../src/vm.c
 VMOBJECTS=$(VMSOURCES:.c=.o)
 
 # Macs use .dylib instead of .so

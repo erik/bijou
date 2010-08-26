@@ -16,7 +16,7 @@ not running loop.s though ;) with `./bijouc sample/<file>.s` and then `./bijou b
 Originally, I had included the Boehm garbage collector library, but it was gigantic
 and Bijou runs without it anyway. If you want to use it, go to
 [the download page](http://www.hpl.hp.com/personal/Hans_Boehm/gc/gc_source/),
-download it, and place the 'gc' folder inside the top level vendor directory (not vm/vendor).
+download it, and place the 'gc' folder inside the top level vendor directory (not src/vendor).
 
 You'll also have to change line 10 of the Makefile to `gc = true`
 

@@ -11,18 +11,18 @@ gc = false
 
 CC=clang
 CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
-INCS= -Ivm 
+INCS= -Isrc
 LIBS= ${GC}
 LDFLAGS= -lm -ldl -lpthread
 
-ALLSOURCES= vm/block.c vm/value.c vm/string.c vm/number.c vm/dump.c vm/func.c \
-vm/compiler.c vm/lib.c vm/load.c vm/vm.c
+ALLSOURCES= src/block.c src/value.c src/string.c src/number.c src/dump.c \
+src/func.c src/compiler.c src/lib.c src/load.c src/vm.c
 ALLOBJECTS=$(ALLSOURCES:.c=.o)
 
-VMSOURCES= $(ALLSOURCES) vm/bijou.c
+VMSOURCES= $(ALLSOURCES) src/bijou.c
 VMOBJECTS= $(VMSOURCES:.c=.o)
 
-COMPILERSOURCES= $(ALLSOURCES) vm/bijouc.c
+COMPILERSOURCES= $(ALLSOURCES) src/bijouc.c
 COMPILEROBJECTS= $(COMPILERSOURCES:.c=.o)
 
 VM=bijou
@@ -51,22 +51,22 @@ all: $(VM) $(COMPILER) bijoulib
 # count source lines of code
 # requires sloccount
 sloc: 
-	@sloccount vm lib | grep '(SLOC)'
+	@sloccount src lib | grep '(SLOC)'
 
 loc: 
-	@wc -l vm/*.[ch] vm/vendor/* lib/*.[ch] | grep total
+	@wc -l src/*.[ch] src/vendor/* lib/*.[ch] | grep total
 
 size: 
-	@rm -f vm/*~ lib/*~ && du -sh vm lib
+	@rm -f src/*~ lib/*~ && du -sh src lib
 
 todo:
-	@find vm lib -type f | xargs grep -n -i "TODO"
-	@find vm lib -type f | xargs grep -n -i "FIXME"
+	@find src lib -type f | xargs grep -n -i "TODO"
+	@find src lib -type f | xargs grep -n -i "FIXME"
 
 # reformat code (requires astyle)
 pretty:
 	@echo " formatting"
-	@astyle -A4 -n vm/*.[ch] lib/*.[ch] | grep formatted \
+	@astyle -A4 -n src/*.[ch] lib/*.[ch] | grep formatted \
 		|| echo "   no changes"
 
 # runs valgrind
@@ -100,29 +100,29 @@ ${GC}:
 	@echo " make gc"
 	@cd vendor/gc && ./configure --disable-threads -q && make -s
 
-vm/bijou.o:    	vm/bijou.c vm/vm.h vm/bijou.h vm/internal.h vm/bopcodes.h \
-vm/dump.h vm/load.h
-vm/bijouc.o:   	vm/bijouc.c vm/bijouc.h vm/internal.h vm/bijou.h vm/compiler.h
-vm/block.o: 	vm/block.c vm/bopcodes.h vm/internal.h vm/dump.h vm/bijou.h \
-vm/vm.h
-vm/compiler.o: 	vm/compiler.c vm/compiler.h vm/bijou.h vm/vm.h vm/bopcodes.h \
-vm/dump.h vm/bijouc.h
-vm/dump.o: 	vm/dump.c vm/config.h vm/bijou.h vm/internal.h vm/dump.h \
-vm/bopcodes.h
-vm/func.o: 	vm/func.c vm/bijou.h vm/func.h vm/vm.h vm/internal.h
-vm/lib.o:	vm/lib.c vm/lib.h vm/bijou.h vm/internal.h vm/vm.h vm/func.h
-vm/load.o: 	vm/load.c vm/bijou.h vm/load.h vm/vm.h vm/internal.h vm/dump.h
-vm/number.o: 	vm/number.c vm/bijou.h vm/internal.h vm/vm.h vm/bopcodes.h
-vm/string.o: 	vm/string.c vm/bijou.h vm/internal.h vm/vm.h
-vm/value.o:	vm/value.c vm/bijou.h vm/internal.h
-vm/vm.o:    	vm/vm.c vm/bijou.h vm/internal.h vm/bopcodes.h vm/vm.h \
-vm/lib.h vm/func.h
+src/bijou.o:    	src/bijou.c src/vm.h src/bijou.h src/internal.h src/bopcodes.h \
+src/dump.h src/load.h
+src/bijouc.o:   	src/bijouc.c src/bijouc.h src/internal.h src/bijou.h src/compiler.h
+src/block.o: 	src/block.c src/bopcodes.h src/internal.h src/dump.h src/bijou.h \
+src/vm.h
+src/compiler.o: 	src/compiler.c src/compiler.h src/bijou.h src/vm.h src/bopcodes.h \
+src/dump.h src/bijouc.h
+src/dump.o: 	src/dump.c src/config.h src/bijou.h src/internal.h src/dump.h \
+src/bopcodes.h
+src/func.o: 	src/func.c src/bijou.h src/func.h src/vm.h src/internal.h
+src/lib.o:	src/lib.c src/lib.h src/bijou.h src/internal.h src/vm.h src/func.h
+src/load.o: 	src/load.c src/bijou.h src/load.h src/vm.h src/internal.h src/dump.h
+src/number.o: 	src/number.c src/bijou.h src/internal.h src/vm.h src/bopcodes.h
+src/string.o: 	src/string.c src/bijou.h src/internal.h src/vm.h
+src/value.o:	src/value.c src/bijou.h src/internal.h
+src/vm.o:    	src/vm.c src/bijou.h src/internal.h src/bopcodes.h src/vm.h \
+src/lib.h src/func.h
 
 
 clean:
 	@echo " cleaning up"
-	@rm -f vm/*.o
-	@rm -f vm/*~
+	@rm -f src/*.o
+	@rm -f src/*~
 	@rm -f $(VM)
 	@rm -f $(COMPILER)
 

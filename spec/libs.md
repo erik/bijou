@@ -44,7 +44,7 @@ For any function X you want to call in Bijou, you'll need an int: `args_X` to
 specify the number of arguments the function takes (-1 for any amount), and to
 declare the function as `func_X` taking the arguments listed above.
 
-The definitions for the various structs can be found in vm/vm.h and vm/bijou.h.
+The definitions for the various structs can be found in src/vm.h and src/bijou.h.
 You probably won't need anything but argv, which contains the arguments passed
 to the function.
 
