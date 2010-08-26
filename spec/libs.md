@@ -1,6 +1,6 @@
 #Dynamically Loaded Libraries
 
-Bijou has the ability to load libraries written in C (or feasibly and natively
+Bijou has the ability to load libraries written in C (or feasibly any natively
 compiled language) at runtime.
 
 Advantages:

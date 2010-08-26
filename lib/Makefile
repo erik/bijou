@@ -3,7 +3,7 @@ CC= gcc
 CFLAGS= -Wall -Wextra -std=c99 $(OPTIMIZE) -g -fPIC -D_POSIX_C_SOURCE=200112L
 INCS= -I../vm
 LDFLAGS = -lm -ldl -shared
-SOURCES= test.c net.c thread.c string.c
+SOURCES= test.c net.c thread.c string.c io.c
 OBJECTS= $(SOURCES:.c=.o)
 
 #shared object extension
@@ -39,6 +39,7 @@ test.o:   test.c
 net.o:    net.c
 thread.o: thread.c
 string.o: string.c
+io.o:     io.c
 
 test.$(SOEXT): test.o
 	@echo "  link test"
@@ -51,6 +52,9 @@ thread.$(SOEXT): thread.o
 	@$(CC) -lpthread $(LDFLAGS) $< $(VMOBJECTS) -o $@
 string.$(SOEXT): string.o
 	@echo "  link string"
+	@$(CC) $(LDFLAGS) $< $(VMOBJECTS) -o $@
+io.$(SOEXT): io.o
+	@echo "  link io"
 	@$(CC) $(LDFLAGS) $< $(VMOBJECTS) -o $@
 
 .c.o:

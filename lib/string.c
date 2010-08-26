@@ -149,7 +149,8 @@ TValue func_substr(VM, BijouBlock* blk, int argc, TValue* argv)
  *	length [Integer]
  */
 int    args_length = 1;
-TValue func_length(VM, BijouBlock* blk, int argc, TValue* argv) {
+TValue func_length(VM, BijouBlock* blk, int argc, TValue* argv)
+{
     UNUSED(vm);
     UNUSED(blk);
     UNUSED(argc);
@@ -158,4 +159,4 @@ TValue func_length(VM, BijouBlock* blk, int argc, TValue* argv) {
 
     return create_bijou_Number(BijouString_len(argv[0].value.s));
 }
- 
+
