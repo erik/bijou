@@ -168,3 +168,25 @@ TValue func_file_slurp(VM, BijouBlock* blk, int argc, TValue* argv)
 
     return create_TValue_string(BijouString_new(buf));
 }
+
+/*
+ * Args -
+ *	file    [FILE*]
+ * Returns -
+ *      zero on success [Integer]
+ */
+int    args_file_flush = 1;
+TValue func_file_flush(VM, BijouBlock* blk, int argc, TValue* argv)
+{
+    UNUSED(vm);
+    UNUSED(blk);
+    UNUSED(argc);
+
+    FILE *file;
+
+    SHOULD_BE(argv[0], BIJOU_TPOINTER);
+
+    file = (FILE*)argv[0].value.pointer;
+
+    return create_bijou_Number(fflush(file));
+}
