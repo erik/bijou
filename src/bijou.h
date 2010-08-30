@@ -19,7 +19,7 @@
 #include "config.h"
 
 #define BIJOU_SIGNATURE "\020bij"
-#define BIJOU_VERSION   0x01
+#define BIJOU_VERSION   0x05
 
 #define UNUSED(x)     ((void)(x))
 

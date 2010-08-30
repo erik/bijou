@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#define BIJOUC_VERSION 0x01
+#define BIJOUC_VERSION 0x05
 
 /* command line switches */
 #define OPT_PARSE (1 << 0)
