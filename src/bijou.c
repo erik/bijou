@@ -150,6 +150,7 @@ int main(int argc, char ** argv)
     if (dump) {
         printf("; Compiled from: %s\n", b->filename);
         BijouVM_dump_functions(vm);
+        BijouVM_dump_constants(vm);
         BijouBlock_dump(vm, b);
     }
 

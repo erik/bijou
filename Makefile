@@ -16,7 +16,7 @@ LIBS= ${GC}
 LDFLAGS= -lm -ldl -lpthread
 
 ALLSOURCES= src/block.c src/value.c src/string.c src/number.c src/dump.c \
-src/func.c src/compiler.c src/lib.c src/load.c src/vm.c
+src/func.c src/compiler.c src/lib.c src/load.c src/vm.c src/const.c
 ALLOBJECTS=$(ALLSOURCES:.c=.o)
 
 VMSOURCES= $(ALLSOURCES) src/bijou.c
@@ -100,13 +100,14 @@ ${GC}:
 	@echo " make gc"
 	@cd vendor/gc && ./configure --disable-threads -q && make -s
 
-src/bijou.o:    	src/bijou.c src/vm.h src/bijou.h src/internal.h src/bopcodes.h \
+src/bijou.o:    src/bijou.c src/vm.h src/bijou.h src/internal.h src/bopcodes.h \
 src/dump.h src/load.h
-src/bijouc.o:   	src/bijouc.c src/bijouc.h src/internal.h src/bijou.h src/compiler.h
+src/bijouc.o:   src/bijouc.c src/bijouc.h src/internal.h src/bijou.h src/compiler.h
 src/block.o: 	src/block.c src/bopcodes.h src/internal.h src/dump.h src/bijou.h \
 src/vm.h
-src/compiler.o: 	src/compiler.c src/compiler.h src/bijou.h src/vm.h src/bopcodes.h \
+src/compiler.o: src/compiler.c src/compiler.h src/bijou.h src/vm.h src/bopcodes.h \
 src/dump.h src/bijouc.h
+src/const.o:	src/const.c src/const.h src/bijou.h src/vm.h src/internal.h	
 src/dump.o: 	src/dump.c src/config.h src/bijou.h src/internal.h src/dump.h \
 src/bopcodes.h
 src/func.o: 	src/func.c src/bijou.h src/func.h src/vm.h src/internal.h

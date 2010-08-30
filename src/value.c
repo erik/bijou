@@ -126,6 +126,12 @@ char *TValue_to_string(TValue t)
         return t.value.s.ptr;
     case BIJOU_TBOOLEAN:
         return t.value.b ? "true" : "false";
+    case BIJOU_TPOINTER: {
+        char *ca = B_MALLOC(sizeof(char) * 20);
+        memset(ca, '\0', 20);
+        sprintf(ca, "%p", t.value.pointer );
+        return ca;
+    }
     case BIJOU_TFUNCTION: {
         char *ca = B_MALLOC(sizeof(char) * 20);
         memset(ca, '\0', 20);
@@ -159,6 +165,8 @@ char *TValue_type_to_string(TValue t)
         return "string";
     case BIJOU_TFUNCTION:
         return "function";
+    case BIJOU_TPOINTER:
+        return "pointer";
     default:
         return "I haven't a damn clue.";
     }

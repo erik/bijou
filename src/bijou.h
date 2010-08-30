@@ -212,6 +212,4 @@ TValue TValue_num_le(TValue, TValue);
 TValue TValue_num_gt(TValue, TValue);
 TValue TValue_num_ge(TValue, TValue);
 
-/* compiler */
-//BijouCompiler *BijouCompiler_new(VM, char*);
 #endif /* _BIJOU_H_ */

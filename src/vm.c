@@ -1,15 +1,15 @@
 /* Copyright 2010 Erik Price */
 
-#include <stdio.h>
-
 #include "bijou.h"
 #include "internal.h"
 #include "bopcodes.h"
 #include "vm.h"
 #include "lib.h"
 #include "func.h"
+#include "const.h"
 
 #include <string.h>
+#include <stdio.h>
 
 BijouVM *BijouVM_new(size_t numglobals)
 {
@@ -17,9 +17,11 @@ BijouVM *BijouVM_new(size_t numglobals)
     v->globals = B_MALLOC(sizeof(TValue) * numglobals);
     v->numglobals = numglobals;
     kv_init(v->functions);
+    kv_init(v->constants);
     kv_init(v->libs);
 
     setup_internal_functions(v);
+    setup_internal_constants(v);
 
     return v;
 }
@@ -40,6 +42,23 @@ void BijouVM_dump_functions(VM)
         }
         printf("\n");
 
+    }
+}
+
+/* dumps the VM's internal constants */
+void BijouVM_dump_constants(VM)
+{
+    printf("; Internal constants:\n");
+
+    size_t i;
+    for (i = 0; i < kv_size(vm->constants); ++i) {
+        TValue t = kv_A(vm->constants, i);
+        printf("\t[%d] %s (%s)", i, TValue_to_string(t), TValue_type_to_string(t));
+        if (++i < kv_size(vm->constants)) {
+            t = kv_A(vm->constants, i);
+            printf("   \t[%d] %s (%s)", i,  TValue_to_string(t), TValue_type_to_string(t));
+        }
+        printf("\n");
     }
 }
 
@@ -81,6 +100,14 @@ int BijouVM_push_function(VM, BijouFunction* func)
 {
     int size = kv_size(vm->functions);
     kv_push(BijouFunction*, vm->functions, func);
+    return size;
+
+}
+
+int BijouVM_push_constant(VM, TValue t)
+{
+    int size = kv_size(vm->constants);
+    kv_push(TValue, vm->constants, t);
     return size;
 
 }

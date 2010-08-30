@@ -106,7 +106,7 @@ typedef enum {
     OP_NOP,         /*          Absolutely nothing. */
 
     OP_MOVE,        /* A B      R[A] = R[B] */
-    OP_LOADK,       /* A Bx     R[A] = K[Bx] */
+    OP_LOADK,       /* A Bx     R[A] = K[Bx] (see explanation below) */
     OP_LOADBOOL,    /* A B      R[A] = (bool)B; */
     OP_LOADNULL,    /* A        R[A] = null */
     OP_GETGLOBAL,   /* A Bx     R[A] = globals[K[Bx]] */
@@ -141,19 +141,27 @@ typedef enum {
 } OpCodes;
 
 /*
+ * for OP_LOADK, the constant at constant index Bx is loaded if not ISK(Bx) (Bx doesn't have
+ * the constant bit on). Otherwise, it will load the internal constant at that index
+ */
+
+/*
  * OP_GETEXTERNAL creates a closure from a dynamically loaded library. The
  * closure is placed in R[A], and is created from the function in the
  * loaded libraries with the name contained in K[B]
  */
 
-/* for OP_CALL, a function pointer is expected to be contained in R[B].
+/*
+ * for OP_CALL, a function pointer is expected to be contained in R[B].
  * C is the number of arguments to pass to the function. R[B] is then
  * called with values R[B + 1], ..., R[B + C]
  * the result is stored in R[A]
 */
 
-/* for OP_CLOSURE, the value loaded into R[A] is the function described
- * in the local function prototype table at index Bx for use with OP_CALL
+/*
+ * for OP_CLOSURE, the value loaded into R[A] is the function described
+ * in the local function prototype table at index Bx for use with OP_CALL.
+ * If Bx is a constant, the built in function at that index is loaded instead
 */
 
 /* for OPCODE_ARGS bitmask magic */
