@@ -12,7 +12,7 @@ SOEXT=so
 LIBS= $(OBJECTS:.o=.$(SOEXT))
 
 VMSOURCES= ../src/block.c ../src/value.c ../src/string.c ../src/number.c ../src/dump.c \
-../src/func.c ../src/compiler.c ../src/lib.c ../src/load.c ../src/vm.c
+../src/func.c ../src/compiler.c ../src/lib.c ../src/load.c ../src/vm.c ../src/const.c
 VMOBJECTS=$(VMSOURCES:.c=.o)
 
 # Macs use .dylib instead of .so

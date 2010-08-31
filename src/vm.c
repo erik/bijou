@@ -356,16 +356,17 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                 memset(func, '\0', 5 + strlen(tval.value.s.ptr));
                 strcpy(func, "func_");
                 strcpy(func + 5, tval.value.s.ptr);
-                func[strlen(func)] = '\0';
+                func[5 +  strlen(tval.value.s.ptr)] = '\0';
 
                 func_args = B_MALLOC( 5 + strlen(tval.value.s.ptr));
                 memset(func_args, '\0', 5 +  strlen(tval.value.s.ptr));
                 strcpy(func_args, "args_");
                 strcpy(func_args + 5, tval.value.s.ptr);
-                func_args[strlen(func_args)] = '\0';
 
+		func_args[strlen(func_args)] = '\0';
+	       
                 num_args = LIB_READ(handle, func_args);
-
+		func[5 +  strlen(tval.value.s.ptr)] = '\0';
                 fptr = (BijouFunc *)LIB_READ(handle, func);
 
 

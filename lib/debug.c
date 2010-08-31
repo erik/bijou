@@ -25,7 +25,7 @@ static time_t start;
  * Returns -
  *	NULL
  */
-int    args_inspect = 0;
+int    args_inspect = 1;
 TValue func_inspect(VM, BijouBlock* blk, int argc, TValue* argv)
 {
     UNUSED(vm);
