@@ -93,12 +93,15 @@ int main(int argc, char ** argv)
                 }
 
                 arg = argv[++i];
-
+                printf(">Looking for: %s\n", arg);
                 void *handle = LIB_LOAD(arg);
+
                 if (! handle) {
-                    fprintf(stderr, "Error on dynamic load: %s\n", LIB_ERROR);
+		    printf(">>Looked for: %s\n", arg);
+                    fprintf(stderr, "%s:%d: Error occured on dynamic load: %s\n", __FILE__, __LINE__, LIB_ERROR);
                     exit(1);
                 }
+                printf("Here, i am\n");
                 BijouVM_push_lib(vm, handle);
 
 

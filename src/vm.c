@@ -143,7 +143,7 @@ int BijouVM_push_lib(VM, void* handle)
 #define EXIT                return create_none()
 
 
-TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[] /*Closure *closure*/)
+TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TValue argv[])
 {
 
     f->stack             = B_MALLOC(sizeof(TValue) * b->regc);
@@ -346,7 +346,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
                 handle = kv_A(vm->libs, ctr);
 
                 if (handle == NULL) {
-                    fprintf(stderr, "Error occured on dynamic load: %s\n", LIB_ERROR);
+                    fprintf(stderr, "%s:%d: Error occured on dynamic load: %s\n", __FILE__, __LINE__, LIB_ERROR);
                     exit(1);
                 }
 
