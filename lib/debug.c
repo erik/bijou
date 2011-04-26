@@ -58,7 +58,7 @@ TValue func_global_dump(VM, BijouBlock* blk, int argc, TValue* argv)
     size_t i;
     for (i = 0; i < vm->numglobals; ++i) {
         TValue value = vm->globals[i];
-        printf("\t[%d] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
+        printf("\t[%lu] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
     }
 
     return create_null();
@@ -85,7 +85,7 @@ TValue func_const_dump(VM, BijouBlock* blk, int argc, TValue* argv)
     size_t i;
     for (i = 0; i < kv_size(vm->constants); ++i) {
         TValue value = kv_A(vm->constants, i);
-        printf("\t[%d] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
+        printf("\t[%lu] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
     }
 
     return create_null();
@@ -148,7 +148,7 @@ TValue func_local_dump(VM, BijouBlock* blk, int argc, TValue* argv)
     size_t i;
     for (i = 0; i < kv_size(blk->locals); ++i) {
         TValue value = kv_A(blk->locals, i);
-        printf("\t[%d] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
+        printf("\t[%lu] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
     }
 
     return create_null();
@@ -173,7 +173,7 @@ TValue func_upval_dump(VM, BijouBlock* blk, int argc, TValue* argv)
     size_t i;
     for (i = 0; i < kv_size(blk->upvals); ++i) {
         TValue value = kv_A(blk->upvals, i);
-        printf("\t[%d] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
+        printf("\t[%lu] %s (%s)\n", i, TValue_to_string(value), TValue_type_to_string(value));
     }
 
     return create_null();

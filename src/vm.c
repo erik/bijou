@@ -53,10 +53,10 @@ void BijouVM_dump_constants(VM)
     size_t i;
     for (i = 0; i < kv_size(vm->constants); ++i) {
         TValue t = kv_A(vm->constants, i);
-        printf("\t[%d] %s (%s)", i, TValue_to_string(t), TValue_type_to_string(t));
+        printf("\t[%lu] %s (%s)", i, TValue_to_string(t), TValue_type_to_string(t));
         if (++i < kv_size(vm->constants)) {
             t = kv_A(vm->constants, i);
-            printf("   \t[%d] %s (%s)", i,  TValue_to_string(t), TValue_type_to_string(t));
+            printf("   \t[%lu] %s (%s)", i,  TValue_to_string(t), TValue_type_to_string(t));
         }
         printf("\n");
     }
@@ -516,7 +516,7 @@ TValue bijou_interpret(VM, BijouFrame *f, BijouBlock *b, int start, int argc, TV
             /* built in function */
             if (ISK(Bx)) {
                 if ((Bx & ~0x100) > kv_size(vm->functions)) {
-                    fprintf(stderr, "Tried to access internal function %d (%d exist)\n", Bx, kv_size(vm->functions));
+                    fprintf(stderr, "Tried to access internal function %d (%lu exist)\n", Bx, kv_size(vm->functions));
                     exit(1);
                 }
                 R[A] = create_function(kv_A(vm->functions, Bx & ~0x100));

@@ -10,7 +10,7 @@ debug = true
 gc = false
 
 CC=clang
-CFLAGS=  -Wall -Wextra -std=c99 $(OPTIMIZE) 
+CFLAGS=  -Wall -Wextra -pedantic -std=c99 -fPIC $(OPTIMIZE) 
 INCS= -Isrc
 LIBS= ${GC}
 LDFLAGS= -lm -ldl -lpthread

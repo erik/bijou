@@ -1,4 +1,4 @@
-CC= gcc
+CC= clang
 # the -D_POSIX_C_SOURCE=200112L bit is for compiling net. (don't ask)
 CFLAGS= -Wall -Wextra -std=c99 $(OPTIMIZE) -g -fPIC -D_POSIX_C_SOURCE=200112L
 INCS= -I../src

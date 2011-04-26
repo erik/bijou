@@ -96,7 +96,7 @@
     1#8     ; 15
     1#200 ; 16
 
-    3#"USER blah blah blah :blah blah\r\n" ; user - 17
+    3#"USER * * :bijou\r\n" ; user - 17
     3#"NICK bijoubot\r\n "                 ; nick - 18    
     3#"JOIN #()\r\n"                       ; channel - 19
 

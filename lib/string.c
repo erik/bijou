@@ -64,7 +64,7 @@ TValue func_char_at(VM, BijouBlock* blk, int argc, TValue* argv)
 
     index = (size_t)argv[1].value.n;
     if (index >= argv[0].value.s.len) {
-        fprintf(stderr, "char_at: index %d out of range for string %s (length: %d)\n",
+        fprintf(stderr, "char_at: index %lu out of range for string %s (length: %lu)\n",
                 index, argv[0].value.s.ptr, argv[0].value.s.len);
         exit(1);
     }
